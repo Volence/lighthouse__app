@@ -13,6 +13,7 @@ Server:
 - Seperated the database schema for the console error audits. There are now 2, one for the audit count (which will contain multiple everytime the audits are run) and one that contains the list of errors and summary (this will be a single item that's over written every time an audit happens).
 - Updated the graphql schema so that both of those requests can be seperate
 - Updated the console information when running all audits
+- Updated dependencies (graphql, lighthouse, mongoose, puppeteer)
 
 Client:
 - Added the new Metrics graphs
@@ -20,3 +21,4 @@ Client:
 - Updated the graphql queries and data to for the updated database schema requests (less information coming back to client, more optimized).
 - Changed the design from 3 different sites to 1 site with its 3 pages
 - Cleaned up/removed a few different hooks being used, less clutter and more optimized
+- Updated dependencies (graphql, victorycharts)
