@@ -20,6 +20,7 @@ exports.runAudits = async (req, res) => {
             }
             console.log(`---LIGHTHOUSE: ${sites.indexOf(siteData) + 1} out of ${sites.length} sites complete`)
         });
+        console.log('--------------Finished with all audits!-----------------')
         res.send({complete: 'done'});
     } catch(err) {
         res.send(err);
@@ -1020,7 +1021,7 @@ const saveLighthouseDetails = (results, siteData, timeCreated, siteName, pageTyp
             let queryParam = {};
             queryParam.siteName = siteName;
             queryParam.pageType = pageType;
-            let lighthouseDetailsContent = {
+            const lighthouseDetailsContent = {
                 siteID: siteData._id,
                 created: timeCreated,
                 siteName: siteName,
@@ -1031,7 +1032,7 @@ const saveLighthouseDetails = (results, siteData, timeCreated, siteName, pageTyp
                 accessibilityAudits: results.accessibilityAudits,
                 bestPracticesAudits: results.bestPracticesAudits
             }
-            let existingDetails = await LighthouseAuditDetails.findOne(queryParam);
+            const existingDetails = await LighthouseAuditDetails.findOne(queryParam);
             if(existingDetails) {
                 await existingDetails.update({...lighthouseDetailsContent});
                 console.log(`Updated ${siteName}'s ${pageType} lighthouse details to the database!`);

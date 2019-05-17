@@ -10,8 +10,11 @@ module.exports = {
             if (args.siteName) {
                 const site = await Site.findOne({'siteName': args.siteName.toLowerCase()})
                 .populate('mainURLAudits')
+                .populate('mainURLAuditDetails')
                 .populate('categoryURLAudits')
+                .populate('categoryURLAuditDetails')
                 .populate('productURLAudits')
+                .populate('productURLAuditDetails')
                 .populate('mainURLLighthouseScores')
                 .populate('categoryURLLighthouseScores')
                 .populate('productURLLighthouseScores')
@@ -22,8 +25,11 @@ module.exports = {
             }
             const sites = await Site.find()
             .populate('mainURLAudits')
+            .populate('mainURLAuditDetails')
             .populate('categoryURLAudits')
+            .populate('categoryURLAuditDetails')
             .populate('productURLAudits')
+            .populate('productURLAuditDetails')
             .populate('mainURLLighthouseScores')
             .populate('categoryURLLighthouseScores')
             .populate('productURLLighthouseScores')
@@ -69,16 +75,16 @@ module.exports = {
         name: 'Date',
         description: 'Date custom scalar type',
         parseValue(value) {
-          return new Date(value); // value from the client
+          return new Date(value);
         },
         serialize(value) {
-          return value.getTime(); // value sent to the client
+          return value.getTime();
         },
         parseLiteral(ast) {
           if (ast.kind === graphqlLanguage.Kind.INT) {
-            return new Date(ast.value) // ast value is always in string format
+            return new Date(ast.value);
           }
           return null;
         },
-      }),
+    }),
 }

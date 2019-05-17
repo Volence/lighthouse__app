@@ -4,6 +4,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import moment from 'moment';
 import AuditChart from './components/Chart';
 import ScoresChart from './components/ScoresChart';
+import MetricsChart from './components/MetricsChart';
 import ApolloClient from 'apollo-boost';
 import * as customQueries from './gql/queries'
 
@@ -43,7 +44,7 @@ const sendMutation = (mutationQuery, mutationVariable) => {
 const App = () => {
 
   const [sites, setSites] = useState();
-  const [currentSiteDisplayed, setCurrentSiteDisplayed] = useState(['', '', '']);
+  const [currentSiteDisplayed, setCurrentSiteDisplayed] = useState(<h2>Site:</h2>);
   const [displayData, setDisplayData] = useState([<EmptyChart>Main</EmptyChart>, <EmptyChart>Category</EmptyChart>, <EmptyChart>Product</EmptyChart>]);
   const [siteCreationFormValues, setSiteCreationFormValues] = useState({siteName: '', mainURL: '', categoryURL: '', productURL: ''});
 
@@ -75,6 +76,13 @@ const App = () => {
     });
     return data;
   }
+  const setMetricsForChart = (arr, type) => {
+    let data = [];
+    arr.forEach(element => {
+      data.push({x: moment(element.created).format('MM-DD-YYYY--HH:mm:ss'), y: element.metrics[type].score * 100})
+    });
+    return data;
+  }
 
   // ==========================================================================================
   // Event Handlers
@@ -82,27 +90,23 @@ const App = () => {
   const loadSiteErrors = async (e, site) => {
     e.preventDefault();
     let { data: {sites: [data]} } = await sendQuery(customQueries.getSiteErrorAuditData(site));
-    setCurrentSiteDisplayed([<h2>{site}:</h2>, currentSiteDisplayed[1], currentSiteDisplayed[2]]);
+    setCurrentSiteDisplayed(<h2>{site}:</h2>);
 
     const sortedMain = sortByCreated(data.mainURLAudits);
     const sortedCategory = sortByCreated(data.categoryURLAudits);
     const sortedProducts = sortByCreated(data.productURLAudits);
 
-    const newestMain = data.mainURLAudits[sortedMain.length - 1];
-    const newestCategory = data.categoryURLAudits[sortedCategory.length - 1];
-    const newestProduct = data.productURLAudits[sortedProducts.length - 1];
+    const mainErrors = data.mainURLAuditDetails[0].errorsText;
+    const mainWarnings = data.mainURLAuditDetails[0].warningsText;
+    const mainFailedRequests = data.mainURLAuditDetails[0].failedRequestsText;
 
-    const mainErrors = newestMain.errorsText;
-    const mainWarnings = newestMain.warningsText;
-    const mainFailedRequests = newestMain.failedRequestsText;
+    const categoryErrors = data.categoryURLAuditDetails[0].errorsText;
+    const categoryWarnings = data.categoryURLAuditDetails[0].warningsText;
+    const categoryFailedRequests = data.categoryURLAuditDetails[0].failedRequestsText;
 
-    const categoryErrors = newestCategory.errorsText;
-    const categoryWarnings = newestCategory.warningsText;
-    const categoryFailedRequests = newestCategory.failedRequestsText;
-
-    const productErrors = newestProduct.errorsText;
-    const productWarnings = newestProduct.warningsText;
-    const productFailedRequests = newestProduct.failedRequestsText;
+    const productErrors = data.productURLAuditDetails[0].errorsText;
+    const productWarnings = data.productURLAuditDetails[0].warningsText;
+    const productFailedRequests = data.productURLAuditDetails[0].failedRequestsText;
 
     const mainErrorDataForChart = setDataForChart(sortedMain, 'errorCount');
     const mainWarningDataForChart = setDataForChart(sortedMain, 'warningCount');
@@ -119,7 +123,7 @@ const App = () => {
     const mainAuditChart = 
     <AuditChart 
     title="Main:" 
-    summary={newestMain.summary} 
+    summary={data.mainURLAuditDetails[0].summary} 
     errorData={mainErrorDataForChart} 
     warningData={mainWarningDataForChart} 
     failedRequestData={mainFailedRequestDataForChart}
@@ -131,7 +135,7 @@ const App = () => {
     const categoryAuditChart = 
     <AuditChart 
         title="Category:" 
-        summary={newestCategory.summary} 
+        summary={data.categoryURLAuditDetails[0].summary} 
         errorData={categoryErrorDataForChart} 
         warningData={categoryWarningDataForChart} 
         failedRequestData={categoryFailedRequestDataForChart}
@@ -142,7 +146,7 @@ const App = () => {
     const productAuditChart = 
     <AuditChart 
         title="Product:" 
-        summary={newestProduct.summary} 
+        summary={data.productURLAuditDetails[0].summary} 
         errorData={productErrorDataForChart} 
         warningData={productWarningDataForChart} 
         failedRequestData={productFailedRequestDataForChart}
@@ -169,7 +173,7 @@ const App = () => {
   const loadSiteScores = async (e, site) => {
     e.preventDefault();
     let { data: {sites: [data]} } = await sendQuery(customQueries.getSiteScores(site));
-    setCurrentSiteDisplayed([currentSiteDisplayed[0], <h2>{site}:</h2>, currentSiteDisplayed[2]]);
+    setCurrentSiteDisplayed(<h2>{site}:</h2>);
 
     const sortedMain = sortByCreated(data.mainURLLighthouseScores);
     const sortedCategory = sortByCreated(data.categoryURLLighthouseScores);
@@ -220,7 +224,68 @@ const App = () => {
   }
 
   const loadSiteMetrics = async (e, site) => {
-    return
+    e.preventDefault();
+    let { data: {sites: [data]} } = await sendQuery(customQueries.getMetricScores(site));
+    setCurrentSiteDisplayed(<h2>{site}:</h2>);
+
+    const sortedMain = sortByCreated(data.mainURLLighthouseScores);
+    const sortedCategory = sortByCreated(data.categoryURLLighthouseScores);
+    const sortedProducts = sortByCreated(data.productURLLighthouseScores);
+
+    const mainFirstMeaningfulPaintForChart = setMetricsForChart(sortedMain, 'firstContentfulPaint');
+    const mainFirstContentfulPaintForChart = setMetricsForChart(sortedMain, 'firstMeaningfulPaint');
+    const mainSpeedIndexForChart = setMetricsForChart(sortedMain, 'speedIndex');
+    const mainInteractiveForChart = setMetricsForChart(sortedMain, 'interactive');
+    const mainFirstCPUIdleForChart = setMetricsForChart(sortedMain, 'firstCPUIdle');
+    const mainLatencyForChart = setMetricsForChart(sortedMain, 'estimatedInputLatency');
+
+    const categoryFirstMeaningfulPaintForChart = setMetricsForChart(sortedCategory, 'firstContentfulPaint');
+    const categoryFirstContentfulPaintForChart = setMetricsForChart(sortedCategory, 'firstMeaningfulPaint');
+    const categorySpeedIndexForChart = setMetricsForChart(sortedCategory, 'speedIndex');
+    const categoryInteractiveForChart = setMetricsForChart(sortedCategory, 'interactive');
+    const categoryFirstCPUIdleForChart = setMetricsForChart(sortedCategory, 'firstCPUIdle');
+    const categoryLatencyForChart = setMetricsForChart(sortedCategory, 'estimatedInputLatency');
+
+    const productFirstMeaningfulPaintForChart = setMetricsForChart(sortedProducts, 'firstContentfulPaint');
+    const productFirstContentfulPaintForChart = setMetricsForChart(sortedProducts, 'firstMeaningfulPaint');
+    const productSpeedIndexForChart = setMetricsForChart(sortedProducts, 'speedIndex');
+    const productInteractiveForChart = setMetricsForChart(sortedProducts, 'interactive');
+    const productFirstCPUIdleForChart = setMetricsForChart(sortedProducts, 'firstCPUIdle');
+    const productLatencyForChart = setMetricsForChart(sortedProducts, 'estimatedInputLatency');
+
+    const mainScoresChart = 
+    <MetricsChart 
+      title="Main:"
+      firstContentfulPaint={mainFirstMeaningfulPaintForChart}
+      firstMeaningfulPaint={mainFirstContentfulPaintForChart}
+      speedIndex={mainSpeedIndexForChart}
+      interactive={mainInteractiveForChart}
+      firstCPUIdle={mainFirstCPUIdleForChart}
+      estimatedInputLatency={mainLatencyForChart}
+    />;
+
+    const categoryScoresChart = 
+    <MetricsChart 
+        title="Category:" 
+        firstContentfulPaint={categoryFirstMeaningfulPaintForChart}
+        firstMeaningfulPaint={categoryFirstContentfulPaintForChart}
+        speedIndex={categorySpeedIndexForChart}
+        interactive={categoryInteractiveForChart}
+        firstCPUIdle={categoryFirstCPUIdleForChart}
+        estimatedInputLatency={categoryLatencyForChart}
+    />
+    const productScoresChart = 
+    <MetricsChart 
+        title="Product:" 
+        firstContentfulPaint={productFirstMeaningfulPaintForChart}
+        firstMeaningfulPaint={productFirstContentfulPaintForChart}
+        speedIndex={productSpeedIndexForChart}
+        interactive={productInteractiveForChart}
+        firstCPUIdle={productFirstCPUIdleForChart}
+        estimatedInputLatency={productLatencyForChart}
+    />
+    
+    setDisplayData([mainScoresChart, categoryScoresChart, productScoresChart]);
   }
 
   const updateSiteCreationFormValues = (event, propertyName) => {
@@ -288,7 +353,7 @@ const App = () => {
 
 const GlobalStyle = createGlobalStyle`
     body {
-      background-color: #F5F5F5;
+      background-color: #1F4F4F;
     }
     input[type=range] {
       height: 29px;
@@ -391,43 +456,45 @@ const SiteListItem = styled.div`
 `
 
 const SiteLink = styled.a`
-  font-weight: bold;
-  text-decoration: none;
-  border: 1px solid black;
-  background-color: rgba(36, 187, 233, .4);
-  box-shadow: 1px 0 4px black;
-  margin: 0 .4rem;
-  color: black;
-  padding: .4rem .8rem;
-  transition: .4s all;
-  text-align: center;
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 5px 0 8px black;
-  }
+    font-weight: bold;
+    text-decoration: none;
+    border: 1px solid black;
+    background-color: rgba(36, 187, 233, .4);
+    box-shadow: 1px 0 4px black;
+    margin: 0 .4rem;
+    color: black;
+    padding: .4rem .8rem;
+    transition: .4s all;
+    text-align: center;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 5px 0 8px black;
+      background-color: rgba(76, 227, 253, .4);
+    }
 `;
 
 const SitesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 `;
 
 const Charts = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
 `;
 
 const AddSiteForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4rem;
 `;
 
 const AddSiteButton = styled.button`
-  margin-top: .6rem;
+    margin-top: .6rem;
 `;
 
 const EmptyChart = styled.div`
@@ -438,12 +505,14 @@ const EmptyChart = styled.div`
     flex-wrap: wrap;
     margin: 4rem 0 0;
     padding-top: .8rem;
+    background-color: #6F9F9F;
+    box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
 `
 
 const SiteAreaTitles = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  margin-bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-bottom: 0;
 `
 
 export default App;

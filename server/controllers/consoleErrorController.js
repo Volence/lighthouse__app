@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Site = mongoose.model('Site');
 const ConsoleErrorAudit = mongoose.model('ConsoleErrorAudit');
+const ConsoleErrorDetails = mongoose.model('ConsoleErrorDetails');
 const puppeteer = require('puppeteer');
 const utils = require ('../utils/utils');
 const moment = require ('moment');
@@ -15,18 +16,37 @@ const saveConsoleErrorResults = async (response, siteName, pageType, URL, timeCr
                 siteName: siteName,
                 pageType: pageType,
                 url: URL,
-                summary: response[URL].Summary,
                 errorCount: response[URL].ErrorCount,
                 warningCount: response[URL].WarningCount,
-                failedRequestCount: response[URL].FailedRequestCount,
+                failedRequestCount: response[URL].FailedRequestCount
+            });
+            const consoleErrorDetailsContent = {
+                siteID: site._id,
+                created: timeCreated,
+                siteName: siteName,
+                pageType: pageType,
+                url: URL,
+                summary: response[URL].Summary,
                 errorsText: response[URL].Errors,
                 warningsText: response[URL].Warnings,
                 failedRequestsText: response[URL].FailedRequests
-            });
+            };
+            let queryParam = {};
+            queryParam.siteName = siteName;
+            queryParam.pageType = pageType;
+            const existingDetails = await ConsoleErrorDetails.findOne(queryParam);
+            if(existingDetails) {
+                await existingDetails.update({...consoleErrorDetailsContent});
+                console.log(`Updated ${siteName}'s ${pageType} error details!`);
+            } else {
+                const consoleErrorDetails = new ConsoleErrorDetails(consoleErrorDetailsContent);
+                await consoleErrorDetails.save(); 
+                site[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
+            }
             await consoleErrorAudit.save();
             site[`${pageType}URLAudits`].push(consoleErrorAudit);
             await site.save();
-            console.log(`Saved ${siteName}'s ${pageType} to the database!`);
+            console.log(`Saved ${siteName}'s ${pageType} console error's summary!`);
             res();
         } catch(err) {
             rej(err);

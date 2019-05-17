@@ -1,5 +1,6 @@
 require('./models/Site');
 require('./models/ConsoleErrorAudits');
+require('./models/ConsoleErrorDetails');
 require('./models/LighthouseScores');
 require('./models/LighthouseAuditDetails');
 const express = require('express');
@@ -28,7 +29,7 @@ const options = {
 }
 
 mongoose.connect(mongooseConnectString, options);
-mongoose.connection.on('error', (err) => {
+mongoose.connection.on('MongoDB error', (err) => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
 });
 mongoose.connection.once('open', function callback () {

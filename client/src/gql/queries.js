@@ -30,36 +30,42 @@ export const getSiteErrorAuditData = (site) => gql`
   sites(siteName: "${site}") {
     mainURLAudits {
       created
-      summary
       errorCount
       warningCount
       failedRequestCount
-      errorsText
-      warningsText
-      failedRequestsText
     }
     categoryURLAudits {
       created
-      summary
       errorCount
       warningCount
       failedRequestCount
-      errorsText
-      warningsText
-      failedRequestsText
     }
     productURLAudits {
       created
-      summary
       errorCount
       warningCount
       failedRequestCount
+    }
+    mainURLAuditDetails {
+      summary
       errorsText
       warningsText
       failedRequestsText
-      }
+    }
+    categoryURLAuditDetails {
+      summary
+      errorsText
+      warningsText
+      failedRequestsText
+    }
+    productURLAuditDetails {
+      summary
+      errorsText
+      warningsText
+      failedRequestsText
     }
   }
+}
 `
 
 export const getSiteScores = (site) => gql`
@@ -90,6 +96,81 @@ export const getSiteScores = (site) => gql`
         bestPractice
         accessibility
         seo
+      }
+    }
+  }
+}
+`
+export const getMetricScores = (site) => gql`
+{
+  sites(siteName: "${site}") {
+    mainURLLighthouseScores {
+      created
+      metrics {
+        firstContentfulPaint {
+          score
+        }
+        firstMeaningfulPaint {
+          score
+        }
+        speedIndex {
+          score
+        }
+        interactive {
+          score
+        }
+        firstCPUIdle {
+          score
+        }
+        estimatedInputLatency {
+          score
+        }
+      }
+    }
+    categoryURLLighthouseScores {
+      created
+      metrics {
+        firstContentfulPaint {
+          score
+        }
+        firstMeaningfulPaint {
+          score
+        }
+        speedIndex {
+          score
+        }
+        interactive {
+          score
+        }
+        firstCPUIdle {
+          score
+        }
+        estimatedInputLatency {
+          score
+        }
+      }
+    }
+    productURLLighthouseScores {
+      created
+      metrics {
+        firstContentfulPaint {
+          score
+        }
+        firstMeaningfulPaint {
+          score
+        }
+        speedIndex {
+          score
+        }
+        interactive {
+          score
+        }
+        firstCPUIdle {
+          score
+        }
+        estimatedInputLatency {
+          score
+        }
       }
     }
   }
