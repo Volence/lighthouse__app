@@ -16,8 +16,6 @@ const graphqlHTTP = require('express-graphql');
 const graphqlSchema = require('./graphql/schema/index');
 const graphqlResolvers = require('./graphql/resolvers/index');
 
-console.log(moment().format());
-
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,7 +34,7 @@ mongoose.connection.once('open', function callback () {
     console.log("Connected to the database");
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`Lighthouse app listening on port ${port}!`));
 
 app.use('//graphql', graphqlHTTP({
     schema: graphqlSchema,

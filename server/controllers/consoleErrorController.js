@@ -75,59 +75,59 @@ const getErrorAudits = (site) => {
 
 const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
     return new Promise( async (res, rej) => {
-    try {
-        let response = {};
-        await utils.asyncForEach(urls, async (url) => {
-            console.log(`Checking for errors on ${url}...`);
-            let errorCount = 0;
-            let errors = [];
-            let warningCount = 0;
-            let warnings = [];
-            let failedRequestCount = 0;
-            let failedRequests = [];
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            page.on('console', msg => {
-                if (msg._type && msg._type == 'error') {
-                    errors.push(msg._text);
-                    errorCount += 1;
-                };
-                if (msg._type && msg._type == 'warning') {
-                    // Having just msg here gave [ConsoleMessage] as a return which gave a cyclical error for JSON.stringify because it was a node element with child references
-                    warnings.push(msg._text);
-                    warningCount += 1;
-                };
-            });
-            page.on('pageerror', error => {
-                errors.push(error.message);
-                errorCount += 1;
+        try {
+            let response = {};
+            await utils.asyncForEach(urls, async (url) => {
+                console.log(`Checking for errors on ${url}...`);
+                let errorCount = 0;
+                let errors = [];
+                let warningCount = 0;
+                let warnings = [];
+                let failedRequestCount = 0;
+                let failedRequests = [];
+                const browser = await puppeteer.launch();
+                const page = await browser.newPage();
+                page.on('console', msg => {
+                    if (msg._type && msg._type == 'error') {
+                        errors.push(msg._text);
+                        errorCount += 1;
+                    };
+                    if (msg._type && msg._type == 'warning') {
+                        // Having just msg here gave [ConsoleMessage] as a return which gave a cyclical error for JSON.stringify because it was a node element with child references
+                        warnings.push(msg._text);
+                        warningCount += 1;
+                    };
                 });
-            page.on('requestfailed', request => {
-                failedRequests.push(`Text: ${request._failureText}; Location: ${request._url} `);
-                failedRequestCount += 1;
+                page.on('pageerror', error => {
+                    errors.push(error.message);
+                    errorCount += 1;
+                    });
+                page.on('requestfailed', request => {
+                    failedRequests.push(`Text: ${request._failureText}; Location: ${request._url} `);
+                    failedRequestCount += 1;
+                });
+                await page.goto(url, {
+                    waitUntil: 'networkidle2',
+                    timeout: 0
+                });
+                await page.waitFor(timeToWaitOnPage);
+                await page.close();
+                await browser.close();
+                response[url] = {
+                    Summary: `You have ${errorCount} errors, ${warningCount} warnings, and ${failedRequestCount} failed requests!`,
+                    ErrorCount: errorCount,
+                    WarningCount: warningCount,
+                    FailedRequestCount: failedRequestCount,
+                    Errors: errors,
+                    Warnings: warnings,
+                    FailedRequests: failedRequests
+                };
             });
-            await page.goto(url, {
-                waitUntil: 'networkidle2',
-                timeout: 0
-            });
-            await page.waitFor(timeToWaitOnPage);
-            await page.close();
-            await browser.close();
-            response[url] = {
-                Summary: `You have ${errorCount} errors, ${warningCount} warnings, and ${failedRequestCount} failed requests!`,
-                ErrorCount: errorCount,
-                WarningCount: warningCount,
-                FailedRequestCount: failedRequestCount,
-                Errors: errors,
-                Warnings: warnings,
-                FailedRequests: failedRequests
-            };
-        });
-        res(response);
-    } catch(err) {
-        rej(err)
-    }
-})
+            res(response);
+        } catch(err) {
+            rej(err)
+        }
+    })
 };
 
 exports.getAllSitesErrorAudits = async (req, res) => {
