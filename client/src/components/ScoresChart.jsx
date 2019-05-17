@@ -123,17 +123,9 @@ const ChartContainer = styled.div`
     position: relative;
     min-height: 55rem;
     box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
-    background: linear-gradient(rgba(36, 187, 233, .4), rgba(190, 187, 233, .4));
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
-    }
+    background: #BEBEBE;
+    color: #212121;
+    border: 1px solid #222831;
 `;
 
 const ChartTitle = styled.code`

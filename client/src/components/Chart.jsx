@@ -11,7 +11,11 @@ const Chart = ({title, summary, errorData, warningData, failedRequestData, error
             padding={{ left: 70, top: 70, right: 70, bottom: 70 }}        
             minDomain={{ y: 0 }}
             maxDomain={{ y: 10 }}
-              theme={VictoryTheme.material}
+            theme={VictoryTheme.material}
+            style={{
+              data: {fill: '#eeeeee'},
+              labels: {fill: '#eeeeee'}
+            }}
           >
           <VictoryAxis dependentAxis/>
           <VictoryAxis
@@ -21,7 +25,7 @@ const Chart = ({title, summary, errorData, warningData, failedRequestData, error
             width={1600}
             style={{
               data: { stroke: "#FF8C00", strokeWidth: 2 },
-              parent: { border: "1px solid #ccc"},
+              parent: { border: "1px solid #eeeeee"},
             }}
             labelComponent={<VictoryTooltip/>}
             data={failedRequestData}
@@ -30,7 +34,7 @@ const Chart = ({title, summary, errorData, warningData, failedRequestData, error
             width={1600}
             style={{
               data: { stroke: "#FFCC00", strokeWidth: 1 },
-              parent: { border: "1px solid #ccc"},
+              parent: { border: "1px solid #eeeeee"},
             }}
             labelComponent={<VictoryTooltip/>}
             data={warningData}
@@ -40,12 +44,17 @@ const Chart = ({title, summary, errorData, warningData, failedRequestData, error
             labels={(datum) => datum.y}
             style={{
               data: { stroke: "#c43a31", strokeWidth: .5 },
-              parent: { border: "1px solid #ccc"},
+              parent: { border: "1px solid #eeeeee"},
             }}
             labelComponent={<VictoryTooltip/>}
             data={errorData}
           />
           </VictoryChart>
+          <Key>
+              <Errors>Errors</Errors>
+              <Warnings>Warnings</Warnings>
+              <FailedRequests>Failed Requests</FailedRequests>
+          </Key>
           <ListErrorSection>
             {(errors !== undefined && errors.length > 0) && <ul><b>Errors:</b> {errors.map(e => <li>{e}</li>)}</ul>}
             {(warnings !== undefined && warnings.length > 0) && <ul><b>Warnings:</b> {warnings.map(e => <li>{e}</li>)}</ul>}
@@ -67,18 +76,39 @@ const ChartContainer = styled.div`
     position: relative;
     min-height: 55rem;
     box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
-    background: linear-gradient(rgba(36, 187, 233, .4), rgba(190, 187, 233, .4));
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
-    }
+    background: #BEBEBE;
+    color: #212121;
+    border: 1px solid #222831;
 `;
+
+const Key = styled.div`
+    background-color: white;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    margin: auto;
+    box-shadow: 2px 0 8px black;
+    color: #222831;
+`
+
+const Errors = styled.h5`
+    background-color: #FF8C00;
+    margin: 0;
+    width: 100%;
+`
+const Warnings = styled.h5`
+    background-color: #FFCC00;
+    margin: 0;
+    width: 100%;
+`
+const FailedRequests = styled.h5`
+    background-color: #c43a31;
+    margin: 0;
+    width: 100%;
+`
 
 const Summary = styled.pre`
    margin-bottom: -120px;
