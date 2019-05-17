@@ -13,8 +13,11 @@ module.exports = buildSchema(`
         categoryURL: String!
         productURL: String!
         mainURLAudits: [ConsoleErrorAudits!]
+        mainURLAuditDetails: [ConsoleErrorAuditDetails!]
         categoryURLAudits: [ConsoleErrorAudits!]
+        categoryURLAuditDetails: [ConsoleErrorAuditDetails!]
         productURLAudits: [ConsoleErrorAudits!]
+        productURLAuditDetails: [ConsoleErrorAuditDetails!]
         mainURLLighthouseScores: [LighthouseScores!]
         categoryURLLighthouseScores: [LighthouseScores!]
         productURLLighthouseScores: [LighthouseScores!]
@@ -32,10 +35,18 @@ module.exports = buildSchema(`
         siteName: String!
         pageType: String!
         url: String!
-        summary: String!
         errorCount: Int!
         warningCount: Int!
         failedRequestCount: Int!
+    }
+    type ConsoleErrorAuditDetails {
+        _id: ID!
+        created: Date!
+        siteID: Site!
+        siteName: String!
+        pageType: String!
+        url: String!
+        summary: String!
         errorsText: [String!]!
         warningsText: [String!]!
         failedRequestsText: [String!]!

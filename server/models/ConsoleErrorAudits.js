@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const moment = require ('moment');
 
 const consoleErrorSchema = mongoose.Schema({
     siteID: {
@@ -9,17 +8,10 @@ const consoleErrorSchema = mongoose.Schema({
     siteName: String,
     pageType: String,
     url: String,
-    created: {
-        type: Date,
-        default: moment.utc()
-    },
-    summary: String,
+    created: Date,
     errorCount: Number,
     warningCount: Number,
-    failedRequestCount: Number,
-    errorsText: [],
-    warningsText: [],
-    failedRequestsText: []
+    failedRequestCount: Number
 });
 
 module.exports = mongoose.model('ConsoleErrorAudit', consoleErrorSchema);

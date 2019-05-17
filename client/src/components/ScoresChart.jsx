@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
 
 const Chart = ({title, performanceScore, bestPracticeScore, accessibilityScore, seoScore}) => {
-    const [viewerAmount, setViewerAmount] = useState(4);
+    const [viewerAmount, setViewerAmount] = useState(0);
 
     const updateMinViewerAmount = (e) => {
         setViewerAmount(e.target.value);
@@ -11,11 +11,11 @@ const Chart = ({title, performanceScore, bestPracticeScore, accessibilityScore, 
 
     return(
         <ChartContainer>
-        <ChartTitle><b>{title}</b></ChartTitle>
+          <ChartTitle><b>{title}</b></ChartTitle>
           <VictoryChart
-          padding={{ left: 70, top: 70, right: 70, bottom: 70 }}        
-          minDomain={{ y: viewerAmount }}
-          maxDomain={{ y: 100 }}
+            padding={{ left: 70, top: 70, right: 70, bottom: 70 }}        
+            minDomain={{ y: viewerAmount }}
+            maxDomain={{ y: 100 }}
             theme={VictoryTheme.material}
           >
           <VictoryAxis dependentAxis/>
@@ -23,42 +23,42 @@ const Chart = ({title, performanceScore, bestPracticeScore, accessibilityScore, 
               style={{ tickLabels: { angle: -90, fontSize: 4 } }}
           />
           <VictoryLine
-          width={1600}
-          style={{
-            data: { stroke: "#33FFB8", strokeWidth: 2 },
-            parent: { border: "1px solid #ccc"},
-          }}
-          labelComponent={<VictoryTooltip/>}
-          data={performanceScore}
+            width={1600}
+            style={{
+              data: { stroke: "#33FFB8", strokeWidth: 2 },
+              parent: { border: "1px solid #ccc"},
+            }}
+            labelComponent={<VictoryTooltip/>}
+            data={performanceScore}
           />
           <VictoryLine
-          width={1600}
-          style={{
-            data: { stroke: "#0049FF", strokeWidth: 1 },
-            parent: { border: "1px solid #ccc"},
-          }}
-          labelComponent={<VictoryTooltip/>}
-          data={bestPracticeScore}
+            width={1600}
+            style={{
+              data: { stroke: "#0049FF", strokeWidth: 1 },
+              parent: { border: "1px solid #ccc"},
+            }}
+            labelComponent={<VictoryTooltip/>}
+            data={bestPracticeScore}
           />
           <VictoryLine
-          width={1600}
-          labels={(datum) => datum.y}
-          style={{
-            data: { stroke: "#FF4200", strokeWidth: .5 },
-            parent: { border: "1px solid #ccc"},
-          }}
-          labelComponent={<VictoryTooltip/>}
-          data={accessibilityScore}
+            width={1600}
+            labels={(datum) => datum.y}
+            style={{
+              data: { stroke: "#FF4200", strokeWidth: .5 },
+              parent: { border: "1px solid #ccc"},
+            }}
+            labelComponent={<VictoryTooltip/>}
+            data={accessibilityScore}
           />
           <VictoryLine
-          width={1600}
-          labels={(datum) => datum.y}
-          style={{
-            data: { stroke: "#6833FF", strokeWidth: .25 },
-            parent: { border: "1px solid #ccc"},
-          }}
-          labelComponent={<VictoryTooltip/>}
-          data={seoScore}
+            width={1600}
+            labels={(datum) => datum.y}
+            style={{
+              data: { stroke: "#6833FF", strokeWidth: .25 },
+              parent: { border: "1px solid #ccc"},
+            }}
+            labelComponent={<VictoryTooltip/>}
+            data={seoScore}
           />
           </VictoryChart>
           <Key>
@@ -67,7 +67,6 @@ const Chart = ({title, performanceScore, bestPracticeScore, accessibilityScore, 
               <BestPractices>Best Practices</BestPractices>
               <SEO>SEO</SEO>
           </Key>
-          
           <SliderContainer><p>0</p><input type="range" name="spacing" onChange={e => updateMinViewerAmount(e)} min="0" max="100" value={viewerAmount} /><p>100</p></SliderContainer>
         </ChartContainer>
     );
@@ -84,6 +83,7 @@ const Key = styled.div`
     align-items: center;
     width: 30%;
     margin: auto;
+    box-shadow: 2px 0 8px black;
 `
 
 const Performance = styled.h5`
@@ -114,30 +114,30 @@ const SliderContainer = styled.div`
 `
 
 const ChartContainer = styled.div`
-  padding-top: .8rem;
-  max-width: 33%;
-  min-width: 45rem;
-  width: 33%;
-  margin: 4rem 0 0;
-  height: fit-content;
-  position: relative;
-  min-height: 55rem;
-  box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
-  background: linear-gradient(rgba(36, 187, 233, .4), rgba(190, 187, 233, .4));
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
-  }
+    padding-top: .8rem;
+    max-width: 33%;
+    min-width: 45rem;
+    width: 33%;
+    margin: 4rem 0 0;
+    height: fit-content;
+    position: relative;
+    min-height: 55rem;
+    box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
+    background: linear-gradient(rgba(36, 187, 233, .4), rgba(190, 187, 233, .4));
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+    }
 `;
 
 const ChartTitle = styled.code`
-  margin-top: .8rem;
+    margin-top: .8rem;
 `;
 
 export default Chart;

@@ -18,6 +18,12 @@ const siteListSchema = mongoose.Schema({
             ref: 'ConsoleErrorAudit'
         }
     ],
+    mainURLAuditDetails: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ConsoleErrorDetails'
+        }
+    ],
     mainURLLighthouseScores: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -41,6 +47,12 @@ const siteListSchema = mongoose.Schema({
             ref: 'ConsoleErrorAudit'
         }
     ],
+    categoryURLAuditDetails: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ConsoleErrorDetails'
+        }
+    ],
     categoryURLLighthouseScores: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -62,6 +74,12 @@ const siteListSchema = mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ConsoleErrorAudit'
+        }
+    ],
+    productURLAuditDetails: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ConsoleErrorDetails'
         }
     ],
     productURLLighthouseScores: [

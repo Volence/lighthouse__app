@@ -1,5 +1,6 @@
 require('./models/Site');
 require('./models/ConsoleErrorAudits');
+require('./models/ConsoleErrorDetails');
 require('./models/LighthouseScores');
 require('./models/LighthouseAuditDetails');
 const express = require('express');
@@ -23,12 +24,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const mongooseConnectString = 'mongodb://127.0.0.1:27017/lighthouse_app'
 const options = {
+  // user: 'steve',
+  // pass: 'coolpoop4',
   useNewUrlParser: true,
   useFindAndModify: false
 }
 
 mongoose.connect(mongooseConnectString, options);
-mongoose.connection.on('error', (err) => {
+mongoose.connection.on('MongoDB error', (err) => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
 });
 mongoose.connection.once('open', function callback () {
