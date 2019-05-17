@@ -1,21 +1,21 @@
 {
   "name": "lighthouse_app",
   "version": "0.0.0",
-  "description": "Find the distance between two zipcodes",
+  "description": "Get various audits and save them to a database with a graphql interface to access the data",
   "main": "server.js",
   "dependencies": {
-    "apollo-server-express": "^2.4.8",
+    "apollo-server-express": "^2.5.0",
     "body-parser": "^1.19.0",
     "chrome-launcher": "^0.10.7",
     "cors": "^2.8.5",
-    "express": "^4.16.4",
+    "express": "^4.17.0",
     "express-graphql": "^0.8.0",
-    "graphql": "^14.2.1",
+    "graphql": "^14.3.0",
     "graphql-tools": "^4.0.4",
-    "lighthouse": "^4.3.0",
+    "lighthouse": "^4.3.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.5.3",
-    "puppeteer": "^1.15.0"
+    "mongoose": "^5.5.9",
+    "puppeteer": "^1.16.0"
   },
   "scripts": {
     "start": "node server.js"
