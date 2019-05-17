@@ -22,3 +22,4 @@ Client:
 - Changed the design from 3 different sites to 1 site with its 3 pages
 - Cleaned up/removed a few different hooks being used, less clutter and more optimized
 - Updated dependencies (graphql, victorycharts)
+- Changed some coloring
