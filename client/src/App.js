@@ -353,7 +353,10 @@ const App = () => {
 
 const GlobalStyle = createGlobalStyle`
     body {
-      background-color: #1F4F4F;
+      background-color: #EEEEEE;
+    }
+    tspan {
+      fill: #eeeeee;
     }
     input[type=range] {
       height: 29px;
@@ -381,7 +384,7 @@ const GlobalStyle = createGlobalStyle`
       height: 14px;
       width: 14px;
       border-radius: 10px;
-      background: #F6A1FF;
+      background: #eeeeee;
       cursor: pointer;
       -webkit-appearance: none;
       margin-top: -8.5px;
@@ -459,17 +462,17 @@ const SiteLink = styled.a`
     font-weight: bold;
     text-decoration: none;
     border: 1px solid black;
-    background-color: rgba(36, 187, 233, .4);
+    background-color: #B2EBF2;
     box-shadow: 1px 0 4px black;
     margin: 0 .4rem;
-    color: black;
+    color: #212121;
     padding: .4rem .8rem;
     transition: .4s all;
     text-align: center;
     &:hover {
       transform: translateY(-4px);
       box-shadow: 5px 0 8px black;
-      background-color: rgba(76, 227, 253, .4);
+      background-color: #00BCD4;
     }
 `;
 
@@ -505,7 +508,8 @@ const EmptyChart = styled.div`
     flex-wrap: wrap;
     margin: 4rem 0 0;
     padding-top: .8rem;
-    background-color: #6F9F9F;
+    background-color: #BEBEBE;
+    color: #212121;
     box-shadow: 1px 0 10px rgba(0, 0, 0, .6);
 `
 
