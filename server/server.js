@@ -24,8 +24,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const mongooseConnectString = 'mongodb://127.0.0.1:27017/lighthouse_app'
 const options = {
-  // user: 'steve',
-  // pass: 'coolpoop4',
   useNewUrlParser: true,
   useFindAndModify: false
 }
