@@ -5,29 +5,29 @@ const ConsoleErrorDetails = mongoose.model('ConsoleErrorDetails');
 import puppeteer from 'puppeteer';
 import moment from 'moment';
 
-const saveConsoleErrorResults = async (response, siteName: string, pageType: string, URL: string, timeCreated: Date): Promise<string> => {
+const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, siteName: string, pageType: string, URL: string, timeCreated: Date): Promise<string> => {
     try {
-        let site = await Site.findOne({ siteName: siteName });
+        const site = await Site.findOne({ siteName: siteName });
         const consoleErrorAudit = new ConsoleErrorAudit({
-            siteID: site._id,
+            siteID: (site as mongoose.Document)._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
             url: URL,
-            errorCount: response[URL].ErrorCount,
-            warningCount: response[URL].WarningCount,
-            failedRequestCount: response[URL].FailedRequestCount,
+            errorCount: response[URL].errorCount,
+            warningCount: response[URL].warningCount,
+            failedRequestCount: response[URL].failedRequestCount,
         });
         const consoleErrorDetailsContent: ConsoleErrorDetailsContent = {
-            siteID: site._id,
+            siteID: (site as mongoose.Document)._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
             url: URL,
-            summary: response[URL].Summary,
-            errorsText: response[URL].Errors,
-            warningsText: response[URL].Warnings,
-            failedRequestsText: response[URL].FailedRequests,
+            summary: response[URL].summary,
+            errorsText: response[URL].errors,
+            warningsText: response[URL].warnings,
+            failedRequestsText: response[URL].failedRequests,
         };
         const queryParam = { siteName: siteName, pageType: pageType };
         const existingDetails = await ConsoleErrorDetails.findOne(queryParam);
@@ -68,15 +68,15 @@ const getErrorAudits = async site => {
 
 const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
     try {
-        let response = {};
+        let response: ConsoleErrorDetailsBySiteName = {};
         await utils.asyncForEach(urls, async url => {
             console.log(`Checking for errors on ${url}...`);
             let errorCount = 0;
-            let errors = [];
+            let errors: string[] = [];
             let warningCount = 0;
-            let warnings = [];
+            let warnings: string[] = [];
             let failedRequestCount = 0;
-            let failedRequests = [];
+            let failedRequests: string[] = [];
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             page.on('console', msg => {
@@ -107,7 +107,7 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
             await browser.close();
             response[url] = {
                 summary: `You have ${errorCount} errors, ${warningCount} warnings, and ${failedRequestCount} failed requests!`,
-                rrrorCount: errorCount,
+                errorCount: errorCount,
                 warningCount: warningCount,
                 failedRequestCount: failedRequestCount,
                 errors: errors,

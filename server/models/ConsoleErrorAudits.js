@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
-
-const consoleErrorSchema = mongoose.Schema({
+"use strict";
+exports.__esModule = true;
+var mongoose_1 = require("mongoose");
+var consoleErrorSchema = new mongoose_1["default"].Schema({
     siteID: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1["default"].Schema.Types.ObjectId,
         ref: 'Site'
     },
     siteName: String,
@@ -13,5 +14,4 @@ const consoleErrorSchema = mongoose.Schema({
     warningCount: Number,
     failedRequestCount: Number
 });
-
-module.exports = mongoose.model('ConsoleErrorAudit', consoleErrorSchema);
+exports["default"] = mongoose_1["default"].model('ConsoleErrorAudit', consoleErrorSchema);

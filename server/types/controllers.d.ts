@@ -6,13 +6,13 @@ interface ConsoleErrorDetailsContent {
     siteName: string;
     pageType: string;
     url: string;
-    summary: string;
-    errorsText: string[];
-    warningsText: string[];
-    failedRequestsText: string[];
+    summary?: string;
+    errorsText?: string[];
+    warningsText?: string[];
+    failedRequestsText?: string[];
 }
 
-interface ConsoleErrorDetailsSiteName {
+interface ConsoleErrorDetailsBySiteName {
     [url: string]: ConsoleErrorDetails;
 }
 

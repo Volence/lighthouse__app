@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-const moment = require ('moment');
-
-const siteListSchema = mongoose.Schema({
+"use strict";
+exports.__esModule = true;
+var mongoose_1 = require("mongoose");
+var moment_1 = require("moment");
+var siteListSchema = new mongoose_1["default"].Schema({
     siteName: {
         type: String,
         trim: true,
@@ -14,25 +15,25 @@ const siteListSchema = mongoose.Schema({
     },
     mainURLAudits: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorAudit'
         }
     ],
     mainURLAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorDetails'
         }
     ],
     mainURLLighthouseScores: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseScores'
         }
     ],
     mainURLLighthouseAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseAuditDetails'
         }
     ],
@@ -43,25 +44,25 @@ const siteListSchema = mongoose.Schema({
     },
     categoryURLAudits: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorAudit'
         }
     ],
     categoryURLAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorDetails'
         }
     ],
     categoryURLLighthouseScores: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseScores'
         }
     ],
     categoryURLLighthouseAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseAuditDetails'
         }
     ],
@@ -72,32 +73,31 @@ const siteListSchema = mongoose.Schema({
     },
     productURLAudits: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorAudit'
         }
     ],
     productURLAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'ConsoleErrorDetails'
         }
     ],
     productURLLighthouseScores: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseScores'
         }
     ],
     productURLLighthouseAuditDetails: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1["default"].Schema.Types.ObjectId,
             ref: 'LighthouseAuditDetails'
         }
     ],
     created: {
         type: Date,
-        default: moment.utc()
+        "default": moment_1["default"].utc()
     }
 });
-
-module.exports = mongoose.model('Site', siteListSchema);
+exports["default"] = mongoose_1["default"].model('Site', siteListSchema);
