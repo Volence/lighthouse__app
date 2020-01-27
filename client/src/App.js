@@ -1,125 +1,161 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './components/Modal';
 import './App.css';
-import styled, { createGlobalStyle } from 'styled-components';
+// import styled from 'styled-components';
 import moment from 'moment';
-import AuditChart from './components/Chart';
-import ScoresChart from './components/ScoresChart';
-import MetricsChart from './components/MetricsChart';
+import AuditChart from './components/ErrorsCharts';
+import ScoresChart from './components/MetricsCharts';
+import MetricsChart from './components/ScoresCarts';
 import * as customQueries from './gql/queries';
-import { AppBar, Button, CssBaseline, Toolbar, IconButton, Drawer, Typography, Divider, List, ListItem, ListItemText, TextField, Tooltip } from '@material-ui/core';
+import { AppBar, Box, CssBaseline, Toolbar, IconButton, Drawer, Hidden, Typography, Divider, List, ListItem, ListItemText, TextField, Tooltip } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Autocomplete } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 import { sendQuery } from './utils';
 
-const App = () => {
-    const drawerWidth = 240;
-
-    const useStyles = makeStyles(theme => ({
-        root: {
-            display: 'flex',
+// Styles
+const drawerWidth = 240;
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: 'flex',
+        color: '#000000de',
+    },
+    appBar: {
+        zIndex: theme.zIndex.drawer + 1,
+    },
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0,
+        [theme.breakpoints.up('sm')]: {
+            width: drawerWidth - 80,
         },
-        appBar: {
-            zIndex: theme.zIndex.drawer + 1,
-        },
-        drawer: {
+        [theme.breakpoints.up('md')]: {
             width: drawerWidth,
-            flexShrink: 0,
         },
-        drawerPaper: {
+    },
+    drawerPaper: {
+        width: drawerWidth,
+        [theme.breakpoints.up('sm')]: {
+            width: drawerWidth - 80,
+        },
+        [theme.breakpoints.up('md')]: {
             width: drawerWidth,
         },
-        content: {
-            flexGrow: 1,
-            padding: theme.spacing(3),
-        },
-        label: {
-            backgroundColor: '#fff',
-        },
-        toolbar: theme.mixins.toolbar,
-        siteSelectionContainer: {
+    },
+    content: {
+        flexGrow: 1,
+        padding: theme.spacing(3),
+    },
+    label: {
+        backgroundColor: '#fff',
+    },
+    toolbar: theme.mixins.toolbar,
+    siteSelectionContainer: {
+        marginLeft: '0',
+        [theme.breakpoints.up('sm')]: {
             marginLeft: 'auto',
         },
-        inputRoot: {
-            backgroundColor: '#fff',
+    },
+    siteSelectionLabel: {
+        backgroundColor: '#fff',
+        color: '#000',
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+            display: 'none',
         },
-        inputBackground: {
-            backgroundColor: '#fff',
+    },
+    siteContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
+    chartTitle: {
+        display: 'flex',
+    },
+    chartContent: {
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        flexWrap: 'wrap',
+    },
+    topBar: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        padding: '0',
+        paddingLeft: '.8rem',
+        paddingBottom: '1rem',
+        [theme.breakpoints.up('sm')]: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            paddingLeft: '24px',
+            paddingRight: '24px',
+            paddingBottom: '0',
         },
-    }));
+    },
+    topBarLeft: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    emptyChart: {
+        height: '35rem',
+        width: '95%',
+        borderColor: 'gray',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '1rem 0 0',
+        paddingTop: '0.8rem',
+        color: 'gray',
+        boxShadow: '1px 0 4px rgba(0, 0, 0, 0.1)',
+        [theme.breakpoints.up('sm')]: {
+            width: '85%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '70%',
+        },
+    },
+    mobilePadding: {
+        height: '40px',
+        [theme.breakpoints.up('sm')]: {
+            height: '0',
+        },
+    },
+}));
 
-    const SitesContainer = styled.div`
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    `;
+const App = () => {
+    const classes = useStyles();
 
-    const Charts = styled.div`
-        display: flex;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
-    `;
-
-    const EmptyChart = styled.div`
-        height: 35rem;
-        width: 50%;
-        min-width: 45rem;
-        border: 1px solid black;
-        display: flex;
-        justify-content: center;
-        margin: 4rem 0 0;
-        padding-top: 0.8rem;
-        color: #212121;
-        box-shadow: 1px 0 10px rgba(0, 0, 0, 0.3);
-    `;
-
-    const SiteAreaTitles = styled.div`
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        margin-bottom: 0;
-    `;
-
+    // State
     const [sites, setSites] = useState();
+    const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
     const [currentSiteDisplayed, setCurrentSiteDisplayed] = useState(<Typography variant="h5">Site:</Typography>);
     const [chartNumber, setChartNumber] = useState(0);
     const [displayType, setDisplayType] = useState('Errors');
     const [displayData, setDisplayData] = useState([
-        <EmptyChart>
+        <Box className={classes.emptyChart}>
             <Typography variant="h4">Select a Site</Typography>
-        </EmptyChart>,
-        <EmptyChart>
+        </Box>,
+        <Box className={classes.emptyChart}>
             <Typography variant="h4">Select a Site</Typography>
-        </EmptyChart>,
-        <EmptyChart>
+        </Box>,
+        <Box className={classes.emptyChart}>
             <Typography variant="h4">Select a Site</Typography>
-        </EmptyChart>,
+        </Box>,
     ]);
     const [currentSelectedSite, setCurrentSelectedSite] = useState('Select Site');
 
+    // Queries
     const getSites = async () => {
         let { data } = await sendQuery(customQueries.getSiteNames);
         displaySiteList(data.sites);
     };
 
     const displaySiteList = siteList => {
-        siteList = siteList.map(
-            site =>
-                // <SiteListItem key={String(Symbol)}>
-                //     {site.siteName}:
-                //     <Button variant="contained" color="primary" href="##" onClick={e => loadSiteErrors(e, site.siteName)}>
-                //         {' '}
-                //         Console Audit Info
-                //     </Button>
-                //     <Button variant="contained" color="primary" href="##" onClick={e => loadSiteScores(e, site.siteName)}>
-                //         Site Scores
-                //     </Button>
-                //     <Button variant="contained" color="primary" href="##" onClick={e => loadSiteMetrics(e, site.siteName)}>
-                //         Site Metrics
-                //     </Button>
-                // </SiteListItem>
-                site
-        );
+        siteList = siteList.map(site => site);
         setSites(siteList);
     };
 
@@ -134,6 +170,7 @@ const App = () => {
         });
         return data;
     };
+
     const setScoresForChart = (arr, type) => {
         let data = [];
         arr.forEach(element => {
@@ -368,18 +405,77 @@ const App = () => {
         getSites();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const classes = useStyles();
+
+    const handleDrawerToggle = () => {
+        setMobileDrawerOpen(!mobileDrawerOpen);
+    };
+
+    const drawerContents = (
+        <>
+            <div className={classes.toolbar} />
+            <Divider />
+            <List>
+                {['Main Page', 'Category Page', 'Product Page'].map((text, index) => (
+                    <Tooltip title={pageToolTips[index]}>
+                        <ListItem button key={text} onClick={e => setChartNumber(index)}>
+                            <ListItemText primary={text} />
+                        </ListItem>
+                    </Tooltip>
+                ))}
+            </List>
+            <Divider />
+            <List>
+                {['Errors', 'Metrics', 'Scores'].map((text, index) => (
+                    <Tooltip title={typeToolTips[index]}>
+                        <ListItem
+                            button
+                            key={text}
+                            onClick={e => {
+                                if (currentSelectedSite === 'Select Site') return;
+                                setDisplayType(text);
+                                setCurrentSiteDisplayed(
+                                    <Typography variant="h5" className={'test'}>
+                                        {`${currentSelectedSite.siteName} (${text})`}:
+                                    </Typography>
+                                );
+                                if (text.toLowerCase() === 'errors') {
+                                    loadSiteErrors(currentSelectedSite.siteName);
+                                } else if (text.toLowerCase() === 'metrics') {
+                                    loadSiteScores(currentSelectedSite.siteName);
+                                } else {
+                                    loadSiteMetrics(currentSelectedSite.siteName);
+                                }
+                            }}
+                        >
+                            <ListItemText primary={text} />
+                        </ListItem>
+                    </Tooltip>
+                ))}
+            </List>
+            <Divider />
+            <List>
+                {['Add Site'].map((text, index) => (
+                    <Tooltip title={addSiteToolTips}>
+                        <Modal key={text}></Modal>
+                    </Tooltip>
+                ))}
+            </List>
+        </>
+    );
+
     return (
         <div className={classes.root}>
             <CssBaseline />
             <AppBar position="fixed" className={classes.appBar}>
-                <Toolbar>
-                    <IconButton edge="start" className={'test'} color="inherit" aria-label="menu">
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={'test'}>
-                        Lighthouse App
-                    </Typography>
+                <Toolbar className={classes.topBar}>
+                    <Box className={classes.topBarLeft}>
+                        <IconButton onClick={handleDrawerToggle} edge="start" aria-label="open drawer" className={classes.menuButton} color="inherit" aria-label="menu">
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography variant="h6" className={'test'}>
+                            Lighthouse App
+                        </Typography>
+                    </Box>
                     {/* <Button color="inherit">Login</Button> */}
                     <Autocomplete
                         id="combo-box-demo"
@@ -387,15 +483,15 @@ const App = () => {
                         classes={{
                             inputRoot: classes.inputRoot,
                             tag: classes.label,
+                            tagSizeSmall: classes.label,
                         }}
                         options={sites ? sites.sort((a, b) => -b.siteName.localeCompare(a.siteName)) : sites}
                         groupBy={option => option.siteName[0].toUpperCase()}
                         onChange={(e, value) => {
-                            console.log('value', value);
                             if (value === 'Select Site' || value === null) return;
                             setCurrentSelectedSite(value);
                             setCurrentSiteDisplayed(
-                                <Typography variant="h5" className={'test'}>
+                                <Typography variant="h5" className={classes.chartTitle}>
                                     {`${value.siteName} (${displayType})`}:
                                 </Typography>
                             );
@@ -410,74 +506,49 @@ const App = () => {
                         getOptionLabel={option => option.siteName}
                         style={{ width: 300 }}
                         size="small"
-                        renderInput={params => <TextField className={classes.siteSelection} {...params} label="Select Site" variant="outlined" fullWidth />}
+                        renderInput={params => <TextField className={classes.siteSelectionLabel} {...params} label="Select Site" variant="standard" fullWidth />}
                     />
                 </Toolbar>
             </AppBar>
-            <Drawer
-                className={classes.drawer}
-                variant="permanent"
-                classes={{
-                    paper: classes.drawerPaper,
-                }}
-                anchor="left"
-            >
-                <div className={classes.toolbar} />
-                <Divider />
-                <List>
-                    {['Main Page', 'Category Page', 'Product Page'].map((text, index) => (
-                        <Tooltip title={pageToolTips[index]}>
-                            <ListItem button key={text} onClick={e => setChartNumber(index)}>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        </Tooltip>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['Errors', 'Metrics', 'Scores'].map((text, index) => (
-                        <Tooltip title={typeToolTips[index]}>
-                            <ListItem
-                                button
-                                key={text}
-                                onClick={e => {
-                                    if (currentSelectedSite === 'Select Site') return;
-                                    setDisplayType(text);
-                                    setCurrentSiteDisplayed(
-                                        <Typography variant="h5" className={'test'}>
-                                            {`${currentSelectedSite.siteName} (${text})`}:
-                                        </Typography>
-                                    );
-                                    if (text.toLowerCase() === 'errors') {
-                                        loadSiteErrors(currentSelectedSite.siteName);
-                                    } else if (text.toLowerCase() === 'metrics') {
-                                        loadSiteScores(currentSelectedSite.siteName);
-                                    } else {
-                                        loadSiteMetrics(currentSelectedSite.siteName);
-                                    }
-                                }}
-                            >
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        </Tooltip>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['Add Site'].map((text, index) => (
-                        <Tooltip title={addSiteToolTips}>
-                            <Modal key={text}></Modal>
-                        </Tooltip>
-                    ))}
-                </List>
-            </Drawer>
+            <Hidden smUp implementation="css">
+                <Drawer
+                    onClose={handleDrawerToggle}
+                    className={classes.drawer}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
+                    anchor="left"
+                    variant="temporary"
+                    open={mobileDrawerOpen}
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                >
+                    {drawerContents}
+                </Drawer>
+            </Hidden>
+            <Hidden xsDown implementation="css">
+                <Drawer
+                    onClose={handleDrawerToggle}
+                    className={classes.drawer}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
+                    anchor="left"
+                    variant="permanent"
+                    open
+                >
+                    {drawerContents}
+                </Drawer>
+            </Hidden>
             <main className={classes.content}>
                 <div className={classes.toolbar} />
+                <div className={classes.mobilePadding} />
                 {/* <Typography variant="h3">Current Sites in the Database:</Typography> */}
-                <SitesContainer>
-                    <SiteAreaTitles>{currentSiteDisplayed}</SiteAreaTitles>
-                    <Charts>{displayData[chartNumber]}</Charts>
-                </SitesContainer>
+                <div className={classes.siteContainer}>
+                    {currentSiteDisplayed}
+                    <div className={classes.chartContent}>{displayData[chartNumber]}</div>
+                </div>
             </main>
         </div>
     );

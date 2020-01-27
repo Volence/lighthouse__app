@@ -1,17 +1,57 @@
 import React from 'react';
 import styled from 'styled-components';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
-import { Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { Box, Typography } from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+    chart: {
+        height: 'fit-content',
+        width: '95%',
+        borderColor: 'black',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        flexWrap: 'wrap',
+        display: 'flex',
+        margin: '1rem 0 0',
+        paddingTop: '0.8rem',
+        color: '#212121',
+        overflowWrap: 'break-word',
+        boxShadow: '1px 0 10px rgba(0, 0, 0, 0.3)',
+        [theme.breakpoints.up('sm')]: {
+            width: '85%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '70%',
+        },
+    },
+    key: {
+        backgroundColor: 'white',
+        border: '1px solid black',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '90%',
+        margin: '2rem auto',
+        [theme.breakpoints.up('sm')]: {
+            width: '50%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '30%',
+        },
+    },
+}));
 
 const Chart = ({ title, summary, errorData, warningData, failedRequestData, errors, warnings, failedRequests }) => {
+    const classes = useStyles();
     return (
-        <ChartContainer>
+        <Box className={classes.chart}>
             <ChartTitle>
                 <Typography variant="h5">{title}</Typography>
                 <Typography variant="body1">{summary}</Typography>
             </ChartTitle>
             <VictoryChart
-                padding={{ left: 70, top: 70, right: 70, bottom: 70 }}
                 minDomain={{ y: 0 }}
                 maxDomain={{ y: 10 }}
                 theme={VictoryTheme.material}
@@ -19,9 +59,15 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                     data: { fill: '#eeeeee' },
                     labels: { fill: '#eeeeee' },
                 }}
+                animate={{
+                    duration: 1000,
+                    onLoad: { duration: 500 },
+                }}
+                height={500}
+                width={1000}
             >
                 <VictoryAxis dependentAxis />
-                <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 4 } }} />
+                <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 8 } }} />
                 <VictoryLine
                     width={1600}
                     style={{
@@ -51,11 +97,11 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                     data={errorData}
                 />
             </VictoryChart>
-            <Key>
+            <Box className={classes.key}>
                 <Errors>Errors</Errors>
                 <Warnings>Warnings</Warnings>
                 <FailedRequests>Failed Requests</FailedRequests>
-            </Key>
+            </Box>
             <ListErrorSection>
                 {errors !== undefined && errors.length > 0 && (
                     <ul>
@@ -88,34 +134,9 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                     </ul>
                 )}
             </ListErrorSection>
-        </ChartContainer>
+        </Box>
     );
 };
-
-const ChartContainer = styled.div`
-    position: relative;
-    height: fit-content;
-    width: 50%;
-    border: 1px solid black;
-    flex-wrap: wrap;
-    margin: 4rem 0 0;
-    padding-top: 0.8rem;
-    color: #212121;
-    box-shadow: 1px 0 10px rgba(0, 0, 0, 0.3);
-`;
-
-const Key = styled.div`
-    background-color: white;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
-    margin: auto;
-    box-shadow: 2px 0 8px black;
-    color: #222831;
-`;
 
 const Errors = styled.h5`
     background-color: #ff8c00;
@@ -133,13 +154,8 @@ const FailedRequests = styled.h5`
     width: 100%;
 `;
 
-const Summary = styled.pre`
-    margin-bottom: -120px;
-`;
-
 const ChartTitle = styled.code`
     margin-top: 0.8rem;
-    margin-bottom: -6rem;
     padding-left: 2rem;
     display: flex;
     flex-direction: column;
@@ -147,6 +163,8 @@ const ChartTitle = styled.code`
 
 const ListErrorSection = styled.div`
     text-align: left;
+    overflow-wrap: break-word;
+    width: 100%;
 `;
 
 export default Chart;
