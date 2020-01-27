@@ -1,9 +1,49 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
-import { Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { Box, Typography } from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+    chart: {
+        height: 'fit-content',
+        width: '95%',
+        borderColor: 'black',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        flexWrap: 'wrap',
+        display: 'flex',
+        margin: '1rem 0 0',
+        paddingTop: '0.8rem',
+        color: '#212121',
+        boxShadow: '1px 0 10px rgba(0, 0, 0, 0.3)',
+        [theme.breakpoints.up('sm')]: {
+            width: '85%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '70%',
+        },
+    },
+    key: {
+        backgroundColor: 'white',
+        border: '1px solid black',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '90%',
+        margin: '2rem auto',
+        [theme.breakpoints.up('sm')]: {
+            width: '50%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '30%',
+        },
+    },
+}));
 
 const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore, seoScore }) => {
+    const classes = useStyles();
     const [viewerAmount, setViewerAmount] = useState(0);
 
     const updateMinViewerAmount = e => {
@@ -11,20 +51,35 @@ const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore,
     };
 
     return (
-        <ChartContainer>
+        <Box className={classes.chart}>
             <ChartTitle>
                 <Typography variant="h5">{title}</Typography>
             </ChartTitle>
-            <VictoryChart padding={{ left: 70, top: 70, right: 70, bottom: 70 }} minDomain={{ y: viewerAmount }} maxDomain={{ y: 100 }} theme={VictoryTheme.material}>
+            <VictoryChart
+                minDomain={{ y: viewerAmount }}
+                maxDomain={{ y: 100 }}
+                theme={VictoryTheme.material}
+                style={{
+                    data: { fill: '#eeeeee' },
+                    labels: { fill: '#eeeeee' },
+                }}
+                animate={{
+                    duration: 1000,
+                    onLoad: { duration: 500 },
+                }}
+                height={500}
+                width={1000}
+            >
                 <VictoryAxis dependentAxis />
-                <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 4 } }} />
+                <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 8 } }} />
                 <VictoryLine
                     width={1600}
                     style={{
                         data: { stroke: '#33FFB8', strokeWidth: 2 },
                         parent: { border: '1px solid #ccc' },
                     }}
-                    labelComponent={<VictoryTooltip />}
+                    labels={() => 'Performance'}
+                    labelComponent={<VictoryTooltip activeData={true} />}
                     data={performanceScore}
                 />
                 <VictoryLine
@@ -57,32 +112,20 @@ const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore,
                     data={seoScore}
                 />
             </VictoryChart>
-            <Key>
+            <Box className={classes.key}>
                 <Performance>Performance</Performance>
                 <Accessibility>Accessibility</Accessibility>
                 <BestPractices>Best Practices</BestPractices>
                 <SEO>SEO</SEO>
-            </Key>
-            <SliderContainer>
+            </Box>
+            {/* <SliderContainer>
                 <p>0</p>
                 <input type="range" name="spacing" onChange={e => updateMinViewerAmount(e)} min="0" max="100" value={viewerAmount} />
                 <p>100</p>
-            </SliderContainer>
-        </ChartContainer>
+            </SliderContainer> */}
+        </Box>
     );
 };
-
-const Key = styled.div`
-    background-color: white;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
-    margin: auto;
-    box-shadow: 2px 0 8px black;
-`;
 
 const Performance = styled.h5`
     background-color: #33ffb8;
@@ -111,21 +154,8 @@ const SliderContainer = styled.div`
     width: fit-content;
 `;
 
-const ChartContainer = styled.div`
-    position: relative;
-    height: fit-content;
-    width: 50%;
-    border: 1px solid black;
-    flex-wrap: wrap;
-    margin: 4rem 0 0;
-    padding-top: 0.8rem;
-    color: #212121;
-    box-shadow: 1px 0 10px rgba(0, 0, 0, 0.3);
-`;
-
 const ChartTitle = styled.code`
     margin-top: 0.8rem;
-    margin-bottom: -6rem;
     padding-left: 2rem;
     display: flex;
     flex-direction: column;

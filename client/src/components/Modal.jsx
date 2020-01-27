@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import styled from 'styled-components';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import { Button, ListItem, ListItemText, TextField } from '@material-ui/core';
+import { Button, Dialog, ListItem, ListItemText, TextField } from '@material-ui/core';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { useSpring, animated } from 'react-spring/web.cjs'; // web.cjs is required for IE 11 support
 import { sendMutation } from '../utils';
 import * as customQueries from '../gql/queries';
 
 const useStyles = makeStyles(theme => ({
-    modal: {
+    dialogContainer: {
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    paper: {
-        backgroundColor: '#fff',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(7, 10),
+        flexDirection: 'column',
     },
 }));
 
@@ -82,82 +76,60 @@ export default function SpringModal() {
         setSiteCreationFormValues({ ...siteCreationFormValues, [propertyName]: event.target.value });
     };
 
-    const AddSiteForm = styled.form`
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 4rem;
-    `;
-
     return (
         <div>
             <ListItem button key={'Add Site'} onClick={handleOpen}>
                 <ListItemText primary={'Add Site'} />
             </ListItem>
-            <Modal
-                aria-labelledby="spring-modal-title"
-                aria-describedby="spring-modal-description"
-                className={classes.modal}
-                open={open}
-                onClose={handleClose}
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    timeout: 500,
-                }}
-            >
-                <Fade in={open}>
-                    <div className={classes.paper}>
-                        <h2>Add a site:</h2>
-                        <AddSiteForm onSubmit={e => submitNewSite(e)}>
-                            <TextField
-                                label="Site Name:"
-                                type="text"
-                                placeholder="esslinger"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                value={siteCreationFormValues.siteName}
-                                onChange={e => updateSiteCreationFormValues(e, 'siteName')}
-                            ></TextField>
-                            <TextField
-                                type="text"
-                                label="Main URL:"
-                                placeholder="https://www.esslinger.com/"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                value={siteCreationFormValues.mainURL}
-                                onChange={e => updateSiteCreationFormValues(e, 'mainURL')}
-                            ></TextField>
-                            <TextField
-                                type="text"
-                                label="Category URL:"
-                                placeholder="https://www.esslinger.com/watch-parts/"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                value={siteCreationFormValues.categoryURL}
-                                onChange={e => updateSiteCreationFormValues(e, 'categoryURL')}
-                            ></TextField>
-                            <TextField
-                                type="text"
-                                label="Product URL:"
-                                placeholder="https://www.esslinger.com/watch-battery-energizer-377-and-376-replacement-cell/"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                value={siteCreationFormValues.productURL}
-                                onChange={e => updateSiteCreationFormValues(e, 'productURL')}
-                            ></TextField>
-                            <Button variant="contained" color="primary" type="submit">
-                                Add Site
-                            </Button>
-                        </AddSiteForm>
-                    </div>
-                </Fade>
-            </Modal>
+            <Dialog maxWidth={'sm'} fullWidth open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Add a site:</DialogTitle>
+                <DialogContent className={classes.dialogContainer} onSubmit={e => submitNewSite(e)}>
+                    <TextField
+                        label="Site Name:"
+                        type="text"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={siteCreationFormValues.siteName}
+                        onChange={e => updateSiteCreationFormValues(e, 'siteName')}
+                    ></TextField>
+                    <TextField
+                        type="text"
+                        label="Main URL:"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={siteCreationFormValues.mainURL}
+                        onChange={e => updateSiteCreationFormValues(e, 'mainURL')}
+                    ></TextField>
+                    <TextField
+                        type="text"
+                        label="Category URL:"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={siteCreationFormValues.categoryURL}
+                        onChange={e => updateSiteCreationFormValues(e, 'categoryURL')}
+                    ></TextField>
+                    <TextField
+                        type="text"
+                        label="Product URL:"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={siteCreationFormValues.productURL}
+                        onChange={e => updateSiteCreationFormValues(e, 'productURL')}
+                    ></TextField>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleClose} color="primary">
+                            Add Site
+                        </Button>
+                    </DialogActions>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
