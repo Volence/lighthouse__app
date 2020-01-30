@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Switch, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     chart: {
         height: 'fit-content',
         width: '95%',
-        borderColor: 'black',
-        borderStyle: 'solid',
-        borderWidth: '1px',
         flexWrap: 'wrap',
         display: 'flex',
         margin: '1rem 0 0',
         paddingTop: '0.8rem',
+        overflowWrap: 'break-word',
         color: '#212121',
-        boxShadow: '1px 0 10px rgba(0, 0, 0, 0.3)',
+        backgroundColor: 'white',
         [theme.breakpoints.up('sm')]: {
             width: '85%',
         },
@@ -24,9 +21,14 @@ const useStyles = makeStyles(theme => ({
             width: '70%',
         },
     },
+    chartTitle: {
+        marginTop: '0.8rem',
+        paddingLeft: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+    },
     key: {
         backgroundColor: 'white',
-        border: '1px solid black',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -40,23 +42,44 @@ const useStyles = makeStyles(theme => ({
             width: '30%',
         },
     },
+    keyContainer: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    colorSwatch: {
+        width: '1rem',
+        height: '1rem',
+    },
+    colorSwatch1: {
+        backgroundColor: '#33ffb8',
+    },
+    colorSwatch2: {
+        backgroundColor: '#ff4200',
+    },
+    colorSwatch3: {
+        backgroundColor: '#0049ff',
+    },
+    colorSwatch4: {
+        backgroundColor: '#6833ff',
+    },
 }));
 
 const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore, seoScore }) => {
     const classes = useStyles();
-    const [viewerAmount, setViewerAmount] = useState(0);
-
-    const updateMinViewerAmount = e => {
-        setViewerAmount(e.target.value);
-    };
+    const [showPerformance, setShowPerformance] = useState(true);
+    const [showAccessibility, setShowAccessibility] = useState(true);
+    const [showBestPractices, setShowBestPractices] = useState(true);
+    const [showSEO, setShowSEO] = useState(true);
 
     return (
-        <Box className={classes.chart}>
-            <ChartTitle>
+        <Box boxShadow={2} className={classes.chart}>
+            <Box className={classes.chartTitle}>
                 <Typography variant="h5">{title}</Typography>
-            </ChartTitle>
+                <Typography variant="body1">Main Categories from The Lighthouse App</Typography>
+            </Box>
             <VictoryChart
-                minDomain={{ y: viewerAmount }}
+                minDomain={{ y: 0 }}
                 maxDomain={{ y: 100 }}
                 theme={VictoryTheme.material}
                 style={{
@@ -64,7 +87,7 @@ const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore,
                     labels: { fill: '#eeeeee' },
                 }}
                 animate={{
-                    duration: 1000,
+                    duration: 700,
                     onLoad: { duration: 500 },
                 }}
                 height={500}
@@ -72,93 +95,78 @@ const Chart = ({ title, performanceScore, bestPracticeScore, accessibilityScore,
             >
                 <VictoryAxis dependentAxis />
                 <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 8 } }} />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#33FFB8', strokeWidth: 2 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labels={() => 'Performance'}
-                    labelComponent={<VictoryTooltip activeData={true} />}
-                    data={performanceScore}
-                />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#0049FF', strokeWidth: 1 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={bestPracticeScore}
-                />
-                <VictoryLine
-                    width={1600}
-                    labels={datum => datum.y}
-                    style={{
-                        data: { stroke: '#FF4200', strokeWidth: 0.5 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={accessibilityScore}
-                />
-                <VictoryLine
-                    width={1600}
-                    labels={datum => datum.y}
-                    style={{
-                        data: { stroke: '#6833FF', strokeWidth: 0.25 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={seoScore}
-                />
+                {showPerformance && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#33FFB8', strokeWidth: 2 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labels={() => 'Performance'}
+                        labelComponent={<VictoryTooltip activeData={true} />}
+                        data={performanceScore}
+                    />
+                )}
+                {showAccessibility && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#0049FF', strokeWidth: 1 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={bestPracticeScore}
+                    />
+                )}
+                {showBestPractices && (
+                    <VictoryLine
+                        width={1600}
+                        labels={datum => datum.y}
+                        style={{
+                            data: { stroke: '#FF4200', strokeWidth: 0.5 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={accessibilityScore}
+                    />
+                )}
+                {showSEO && (
+                    <VictoryLine
+                        width={1600}
+                        labels={datum => datum.y}
+                        style={{
+                            data: { stroke: '#6833FF', strokeWidth: 0.25 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={seoScore}
+                    />
+                )}
             </VictoryChart>
             <Box className={classes.key}>
-                <Performance>Performance</Performance>
-                <Accessibility>Accessibility</Accessibility>
-                <BestPractices>Best Practices</BestPractices>
-                <SEO>SEO</SEO>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch1}`}></Box>
+                    <Switch color="primary" checked={showPerformance} onChange={e => setShowPerformance(e.target.checked)}></Switch>
+                    <Typography variant="h6">Performance</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch2}`}></Box>
+                    <Switch color="primary" checked={showAccessibility} onChange={e => setShowAccessibility(e.target.checked)}></Switch>
+                    <Typography variant="h6">Accessibility</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch3}`}></Box>
+                    <Switch color="primary" checked={showBestPractices} onChange={e => setShowBestPractices(e.target.checked)}></Switch>
+                    <Typography variant="h6">Best Practices</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch4}`}></Box>
+                    <Switch color="primary" checked={showSEO} onChange={e => setShowSEO(e.target.checked)}></Switch>
+                    <Typography variant="h6">SEO</Typography>
+                </Box>
             </Box>
-            {/* <SliderContainer>
-                <p>0</p>
-                <input type="range" name="spacing" onChange={e => updateMinViewerAmount(e)} min="0" max="100" value={viewerAmount} />
-                <p>100</p>
-            </SliderContainer> */}
         </Box>
     );
 };
-
-const Performance = styled.h5`
-    background-color: #33ffb8;
-    margin: 0;
-    width: 100%;
-`;
-const Accessibility = styled.h5`
-    background-color: #ff4200;
-    margin: 0;
-    width: 100%;
-`;
-const BestPractices = styled.h5`
-    background-color: #0049ff;
-    margin: 0;
-    width: 100%;
-`;
-const SEO = styled.h5`
-    background-color: #6833ff;
-    margin: 0;
-    width: 100%;
-`;
-
-const SliderContainer = styled.div`
-    display: flex;
-    margin: 0 auto;
-    width: fit-content;
-`;
-
-const ChartTitle = styled.code`
-    margin-top: 0.8rem;
-    padding-left: 2rem;
-    display: flex;
-    flex-direction: column;
-`;
 
 export default Chart;
