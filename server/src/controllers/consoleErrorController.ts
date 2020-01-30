@@ -1,15 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { ConsoleErrorDetailsType } from '../models/ConsoleErrorDetails';
 const Site = mongoose.model('Site');
 const ConsoleErrorAudit = mongoose.model('ConsoleErrorAudit');
 const ConsoleErrorDetails = mongoose.model('ConsoleErrorDetails');
 import puppeteer from 'puppeteer';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
-const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, siteName: string, pageType: string, URL: string, timeCreated: Date): Promise<string> => {
+const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, siteName: string, pageType: string, URL: string, timeCreated: Moment): Promise<string> => {
     try {
         const site = await Site.findOne({ siteName: siteName });
         const consoleErrorAudit = new ConsoleErrorAudit({
-            siteID: (site as mongoose.Document)._id,
+            siteID: (site as Document)._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
@@ -18,8 +19,8 @@ const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, 
             warningCount: response[URL].warningCount,
             failedRequestCount: response[URL].failedRequestCount,
         });
-        const consoleErrorDetailsContent: ConsoleErrorDetailsContent = {
-            siteID: (site as mongoose.Document)._id,
+        const consoleErrorDetailsContent = {
+            siteID: (site as Document)._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
@@ -37,11 +38,11 @@ const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, 
         } else {
             const consoleErrorDetails = new ConsoleErrorDetails(consoleErrorDetailsContent);
             await consoleErrorDetails.save();
-            site[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
+            (site as Document)[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
         }
         await consoleErrorAudit.save();
-        site[`${pageType}URLAudits`].push(consoleErrorAudit);
-        await site.save();
+        (site as Document)[`${pageType}URLAudits`].push(consoleErrorAudit);
+        await (site as mongoose.Document).save();
         console.log(`Saved ${siteName}'s ${pageType} console error's summary!`);
         return 'Complete!';
     } catch (err) {
@@ -51,11 +52,15 @@ const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, 
 
 const getErrorAudits = async site => {
     try {
-        let response = {};
-        let queryParam = {};
-        queryParam.siteName = site.siteName;
-        queryParam.pageType = 'main';
-        response.main = await ConsoleErrorAudit.find(queryParam);
+        let queryParam = {
+            siteName: site.siteName,
+            pageType: 'main',
+        };
+        let response = {
+            main: await ConsoleErrorAudit.find(queryParam),
+            category: [] as Document[],
+            products: [] as Document[],
+        };
         queryParam.pageType = 'category';
         response.category = await ConsoleErrorAudit.find(queryParam);
         queryParam.pageType = 'product';
@@ -69,7 +74,9 @@ const getErrorAudits = async site => {
 const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
     try {
         let response: ConsoleErrorDetailsBySiteName = {};
-        await utils.asyncForEach(urls, async url => {
+        // Puppeteer types was giving back errors even though the correct data is coming through
+        const runConsoleAudits = async ([url, ...urls]: any[]) => {
+            if (url === undefined) return;
             console.log(`Checking for errors on ${url}...`);
             let errorCount = 0;
             let errors: string[] = [];
@@ -80,12 +87,16 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             page.on('console', msg => {
+                // @ts-ignore
                 if (msg._type && msg._type == 'error') {
+                    // @ts-ignore
                     errors.push(msg._text);
                     errorCount += 1;
                 }
+                // @ts-ignore
                 if (msg._type && msg._type == 'warning') {
                     // Having just msg here gave [ConsoleMessage] as a return which gave a cyclical error for JSON.stringify because it was a node element with child references
+                    // @ts-ignore
                     warnings.push(msg._text);
                     warningCount += 1;
                 }
@@ -95,6 +106,7 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
                 errorCount += 1;
             });
             page.on('requestfailed', request => {
+                // @ts-ignore
                 failedRequests.push(`Text: ${request._failureText}; Location: ${request._url} `);
                 failedRequestCount += 1;
             });
@@ -114,7 +126,9 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
                 warnings: warnings,
                 failedRequests: failedRequests,
             };
-        });
+            return await runConsoleAudits(urls);
+        };
+        await runConsoleAudits(urls);
         return response;
     } catch (err) {
         return err;
@@ -125,23 +139,27 @@ const getAllSitesErrorAudits = async () => {
     try {
         const sites = await Site.find();
         let response = {};
-        await utils.asyncForEach(sites, async site => {
+        const runSiteAudit = async ([site, ...sites]: any[]) => {
+            if (site === undefined) return;
             console.log(`Pulling console error data from ${site.siteName}`);
             let siteName = site.siteName;
             response[siteName] = await getErrorAudits(site);
-        });
+            return runSiteAudit(sites);
+        };
+        await runSiteAudit(sites);
         return;
     } catch (err) {
         throw err;
     }
 };
 
-exports.getSiteErrorAudits = async () => {
+exports.getSiteErrorAudits = async siteEntered => {
     try {
-        let queryParam = {};
-        queryParam.siteName = req.params.site;
+        let queryParam = { siteName: siteEntered };
         const site = await Site.findOne(queryParam);
         let response = {};
+        // Need to fix this but can't figure out why it's not responding correctly to the type
+        // @ts-ignore
         let siteName = site.siteName;
         console.log(`Pulling console error data from ${siteName}`);
         response[siteName] = await getErrorAudits(site);
@@ -155,7 +173,8 @@ exports.runConsoleAuditsOnAll = async () => {
     try {
         let sites = await Site.find();
         let response = {};
-        await utils.asyncForEach(sites, async site => {
+        const runSiteAudit = async ([site, ...sites]: any[]) => {
+            if (site === undefined) return;
             let time = moment.utc();
             let mainResponse = await checkConsolesForErrors([site.mainURL], 2000);
             await saveConsoleErrorResults(mainResponse, site.siteName, 'main', site.mainURL, time);
@@ -164,16 +183,17 @@ exports.runConsoleAuditsOnAll = async () => {
             let productResponse = await checkConsolesForErrors([site.productURL], 2000);
             await saveConsoleErrorResults(productResponse, site.siteName, 'product', site.productURL, time);
             response[site.siteName] = [mainResponse, categoryResponse, productResponse];
-        });
+            return await runSiteAudit(sites);
+        };
+        await runSiteAudit(sites);
         return response;
     } catch (err) {
         throw err;
     }
 };
 
-exports.runConsoleAuditsOnSingleSite = async () => {
+exports.runConsoleAuditsOnSingleSite = async siteName => {
     try {
-        let siteName = req.body.siteName.toLowerCase();
         let foundSite = await Site.findOne({ siteName: siteName });
         if (foundSite) {
             let time = moment.utc();
@@ -199,7 +219,8 @@ exports.runAllAudits = async () => {
     try {
         let sites = await Site.find();
         let response = {};
-        await utils.asyncForEach(sites, async site => {
+        const runSiteAudit = async ([site, ...sites]: any[]) => {
+            if (site === undefined) return;
             let time = moment.utc();
             let mainResponse = await checkConsolesForErrors([site.mainURL], 2000);
             await saveConsoleErrorResults(mainResponse, site.siteName, 'main', site.mainURL, time);
@@ -209,7 +230,9 @@ exports.runAllAudits = async () => {
             await saveConsoleErrorResults(productResponse, site.siteName, 'product', site.productURL, time);
             response[site.siteName] = [mainResponse, categoryResponse, productResponse];
             console.log(`---ConsoleAuditErrors: ${sites.indexOf(site) + 1} out of ${sites.length} sites complete`);
-        });
+            return await runSiteAudit(sites);
+        };
+        await runSiteAudit(sites);
         return response;
     } catch (err) {
         return err;

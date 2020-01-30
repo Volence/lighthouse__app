@@ -4,7 +4,6 @@ const chromeLauncher = require('chrome-launcher');
 const LighthouseScores = mongoose.model('LighthouseScores');
 const LighthouseAuditDetails = mongoose.model('LighthouseAuditDetails');
 const consoleErrorController = require('../controllers/consoleErrorController');
-const utils = require ('../utils/utils');
 const Site = mongoose.model('Site');
 const moment = require('moment');
 
