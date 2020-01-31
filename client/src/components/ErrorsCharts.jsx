@@ -21,6 +21,12 @@ const useStyles = makeStyles(theme => ({
             width: '70%',
         },
     },
+    chartTitle: {
+        marginTop: '0.8rem',
+        paddingLeft: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+    },
     key: {
         backgroundColor: 'white',
         display: 'flex',

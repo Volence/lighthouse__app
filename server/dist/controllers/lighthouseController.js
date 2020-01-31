@@ -8,30 +8,49 @@ const chromeLauncher = require('chrome-launcher');
 const LighthouseScores_1 = __importDefault(require("../models/LighthouseScores"));
 const LighthouseAuditDetails_1 = __importDefault(require("../models/LighthouseAuditDetails"));
 const Site_1 = __importDefault(require("../models/Site"));
+const consoleErrorController = require('../controllers/consoleErrorController');
 const moment = require('moment');
-const runAudits = async () => {
-    try {
-        const sites = await Site_1.default.find();
-        let siteCount = 0;
-        const siteTotal = sites.length;
-        const runEachSite = async ([siteData, ...sites]) => {
-            if (siteData === undefined)
-                return;
-            siteCount++;
-            try {
-                await runLighthouseAndSaveToDatabase(siteData, siteData.siteName);
-            }
-            catch (err) {
-                console.log('Error: ', err);
-            }
-            console.log(`---LIGHTHOUSE: ${siteCount} out of ${siteTotal} sites complete`);
-            return await runEachSite(sites);
-        };
-        await runEachSite(sites);
-        return '--------------Finished with all audits!-----------------';
+const runAudits = async (newSite = null) => {
+    if (newSite !== null) {
+        try {
+            await consoleErrorController.runConsoleAuditsOnSingleSite(newSite);
+            let queryParam = { siteName: newSite };
+            const site = await Site_1.default.findOne(queryParam);
+            if (site === null)
+                return 'Site not Found';
+            await runLighthouseAndSaveToDatabase(site, site.siteName);
+            console.log(`Finished running lighthouse checks on new site!`);
+            return 'Finished';
+        }
+        catch (err) {
+            return err;
+        }
     }
-    catch (err) {
-        return err;
+    else {
+        try {
+            await consoleErrorController.runAllAudits();
+            const sites = await Site_1.default.find();
+            let siteCount = 0;
+            const siteTotal = sites.length;
+            const runEachSite = async ([siteData, ...sites]) => {
+                if (siteData === undefined)
+                    return;
+                siteCount++;
+                try {
+                    await runLighthouseAndSaveToDatabase(siteData, siteData.siteName);
+                }
+                catch (err) {
+                    console.log('Error: ', err);
+                }
+                console.log(`---LIGHTHOUSE: ${siteCount} out of ${siteTotal} sites complete`);
+                return await runEachSite(sites);
+            };
+            await runEachSite(sites);
+            return '--------------Finished with all audits!-----------------';
+        }
+        catch (err) {
+            return err;
+        }
     }
 };
 exports.runAudits = runAudits;

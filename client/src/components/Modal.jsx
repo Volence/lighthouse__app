@@ -65,8 +65,10 @@ export default function SpringModal() {
         try {
             event.preventDefault();
             let response = sendMutation(customQueries.createSite, siteCreationFormValues);
+            setOpen(false);
             console.log('response ', response);
         } catch (err) {
+            setOpen(false);
             console.log(err);
         }
     };

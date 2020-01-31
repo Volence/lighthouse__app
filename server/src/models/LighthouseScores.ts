@@ -36,7 +36,7 @@ export interface LighthouseScoreType extends Document {
             score: number;
             value: number;
         };
-        estimatedInputLatency: {
+        maxPotentialFid: {
             score: number;
             value: number;
         };
@@ -83,7 +83,7 @@ const lighthouseScoreSchema = new mongoose.Schema({
             score: Number,
             value: Number,
         },
-        estimatedInputLatency: {
+        maxPotentialFid: {
             score: Number,
             value: Number,
         },

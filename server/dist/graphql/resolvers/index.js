@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Site_1 = __importDefault(require("../../models/Site"));
 const ConsoleErrorAudits_1 = __importDefault(require("../../models/ConsoleErrorAudits"));
 const moment_1 = __importDefault(require("moment"));
+const lighthouseController_1 = require("../../controllers/lighthouseController");
 const graphql = require('graphql');
 const graphqlLanguage = require('graphql/language');
 const graphqlResolvers = {
@@ -78,6 +79,7 @@ const graphqlResolvers = {
             });
             let results = await site.save();
             console.log(`Saved ${args.siteInput.siteName} to the database!`);
+            lighthouseController_1.runAudits(args.siteInput.siteName);
             return results;
         }
     },

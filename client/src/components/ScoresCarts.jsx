@@ -71,14 +71,14 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, interactive, firstCPUIdle, estimatedInputLatency }) => {
+const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, interactive, firstCPUIdle, maxPotentialFid }) => {
     const classes = useStyles();
     const [showFirstContentfulPaint, setShowFirstContentfulPaint] = useState(true);
     const [showFirstMeaningfulPaint, setShowFirstMeaningfulPaint] = useState(true);
     const [showSpeedIndex, setShowSpeedIndex] = useState(true);
     const [showInteractive, setShowInteractive] = useState(true);
     const [showFirstCPUIdle, setShowFirstCPUIdle] = useState(true);
-    const [showEstimatedInputLatency, setShowEstimatedInputLatency] = useState(true);
+    const [showMaxPotentialFid, setShowMaxPotentialFid] = useState(true);
 
     return (
         <Box boxShadow={2} className={classes.chart}>
@@ -159,7 +159,7 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
                         data={firstCPUIdle}
                     />
                 )}
-                {showEstimatedInputLatency && (
+                {maxPotentialFid && (
                     <VictoryLine
                         width={1600}
                         labels={datum => datum.y}
@@ -168,7 +168,7 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
                             parent: { border: '1px solid #ccc' },
                         }}
                         labelComponent={<VictoryTooltip />}
-                        data={estimatedInputLatency}
+                        data={maxPotentialFid}
                     />
                 )}
             </VictoryChart>
@@ -200,8 +200,8 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
                 </Box>
                 <Box className={classes.keyContainer}>
                     <Box className={`${classes.colorSwatch} ${classes.colorSwatch6}`}></Box>
-                    <Switch color="primary" checked={showEstimatedInputLatency} onChange={e => setShowEstimatedInputLatency(e.target.checked)}></Switch>
-                    <Typography variant="h6">Estimated Input Latency</Typography>
+                    <Switch color="primary" checked={showMaxPotentialFid} onChange={e => setShowMaxPotentialFid(e.target.checked)}></Switch>
+                    <Typography variant="h6">Max Potential Fid</Typography>
                 </Box>
             </Box>
         </Box>

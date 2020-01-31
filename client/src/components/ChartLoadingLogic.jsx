@@ -27,6 +27,7 @@ const setScoresForChart = (arr, type) => {
 };
 
 const setMetricsForChart = (arr, type) => {
+    console.log('type', type);
     let data = [];
     arr.forEach(element => {
         data.push({ x: moment(element.created).format('MM-DD-YYYY--HH:mm:ss'), y: element.metrics[type].score * 100 });
@@ -187,21 +188,21 @@ const loadSiteMetrics = async site => {
     const mainSpeedIndexForChart = setMetricsForChart(sortedMain, 'speedIndex');
     const mainInteractiveForChart = setMetricsForChart(sortedMain, 'interactive');
     const mainFirstCPUIdleForChart = setMetricsForChart(sortedMain, 'firstCPUIdle');
-    const mainLatencyForChart = setMetricsForChart(sortedMain, 'estimatedInputLatency');
+    const mainLatencyForChart = setMetricsForChart(sortedMain, 'maxPotentialFid');
 
     const categoryFirstMeaningfulPaintForChart = setMetricsForChart(sortedCategory, 'firstContentfulPaint');
     const categoryFirstContentfulPaintForChart = setMetricsForChart(sortedCategory, 'firstMeaningfulPaint');
     const categorySpeedIndexForChart = setMetricsForChart(sortedCategory, 'speedIndex');
     const categoryInteractiveForChart = setMetricsForChart(sortedCategory, 'interactive');
     const categoryFirstCPUIdleForChart = setMetricsForChart(sortedCategory, 'firstCPUIdle');
-    const categoryLatencyForChart = setMetricsForChart(sortedCategory, 'estimatedInputLatency');
+    const categoryLatencyForChart = setMetricsForChart(sortedCategory, 'maxPotentialFid');
 
     const productFirstMeaningfulPaintForChart = setMetricsForChart(sortedProducts, 'firstContentfulPaint');
     const productFirstContentfulPaintForChart = setMetricsForChart(sortedProducts, 'firstMeaningfulPaint');
     const productSpeedIndexForChart = setMetricsForChart(sortedProducts, 'speedIndex');
     const productInteractiveForChart = setMetricsForChart(sortedProducts, 'interactive');
     const productFirstCPUIdleForChart = setMetricsForChart(sortedProducts, 'firstCPUIdle');
-    const productLatencyForChart = setMetricsForChart(sortedProducts, 'estimatedInputLatency');
+    const productLatencyForChart = setMetricsForChart(sortedProducts, 'maxPotentialFid');
 
     const mainScoresChart = (
         <MetricsChart
@@ -211,7 +212,7 @@ const loadSiteMetrics = async site => {
             speedIndex={mainSpeedIndexForChart}
             interactive={mainInteractiveForChart}
             firstCPUIdle={mainFirstCPUIdleForChart}
-            estimatedInputLatency={mainLatencyForChart}
+            maxPotentialFid={mainLatencyForChart}
         />
     );
 
@@ -223,7 +224,7 @@ const loadSiteMetrics = async site => {
             speedIndex={categorySpeedIndexForChart}
             interactive={categoryInteractiveForChart}
             firstCPUIdle={categoryFirstCPUIdleForChart}
-            estimatedInputLatency={categoryLatencyForChart}
+            maxPotentialFid={categoryLatencyForChart}
         />
     );
 
@@ -235,7 +236,7 @@ const loadSiteMetrics = async site => {
             speedIndex={productSpeedIndexForChart}
             interactive={productInteractiveForChart}
             firstCPUIdle={productFirstCPUIdleForChart}
-            estimatedInputLatency={productLatencyForChart}
+            maxPotentialFid={productLatencyForChart}
         />
     );
 
