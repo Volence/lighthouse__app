@@ -1,13 +1,13 @@
 import gql from 'graphql-tag';
 
-export const getSiteNames =gql`
+export const getSiteNames = gql`
 {
   sites {
     siteName
   }
 }
-`
-export const getSpecificSite = (site) => gql`
+`;
+export const getSpecificSite = site => gql`
   {
     sites(siteName: "${site}") {
       mainURLAudits {
@@ -15,7 +15,7 @@ export const getSpecificSite = (site) => gql`
       }
     }
   }
-`
+`;
 
 export const createSite = gql`
     mutation createSite($siteInput: SiteInput!) {
@@ -23,9 +23,9 @@ export const createSite = gql`
             siteName
         } 
     }
-`
+`;
 
-export const getSiteErrorAuditData = (site) => gql`
+export const getSiteErrorAuditData = site => gql`
   {
   sites(siteName: "${site}") {
     mainURLAudits {
@@ -66,9 +66,9 @@ export const getSiteErrorAuditData = (site) => gql`
     }
   }
 }
-`
+`;
 
-export const getSiteScores = (site) => gql`
+export const getSiteScores = site => gql`
 {
   sites(siteName: "${site}") {
 		mainURLLighthouseScores {
@@ -100,8 +100,8 @@ export const getSiteScores = (site) => gql`
     }
   }
 }
-`
-export const getMetricScores = (site) => gql`
+`;
+export const getMetricScores = site => gql`
 {
   sites(siteName: "${site}") {
     mainURLLighthouseScores {
@@ -122,7 +122,7 @@ export const getMetricScores = (site) => gql`
         firstCPUIdle {
           score
         }
-        estimatedInputLatency {
+        maxPotentialFid {
           score
         }
       }
@@ -145,7 +145,7 @@ export const getMetricScores = (site) => gql`
         firstCPUIdle {
           score
         }
-        estimatedInputLatency {
+        maxPotentialFid {
           score
         }
       }
@@ -168,11 +168,11 @@ export const getMetricScores = (site) => gql`
         firstCPUIdle {
           score
         }
-        estimatedInputLatency {
+        maxPotentialFid {
           score
         }
       }
     }
   }
 }
-`
+`;

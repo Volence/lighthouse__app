@@ -128,7 +128,7 @@ export default function SpringModal() {
                         <Button onClick={handleClose} color="primary">
                             Cancel
                         </Button>
-                        <Button onClick={handleClose} color="primary">
+                        <Button onClick={submitNewSite} color="primary">
                             Add Site
                         </Button>
                     </DialogActions>

@@ -1,8 +1,8 @@
-const { buildSchema } = require('graphql');
+import { buildSchema } from 'graphql';
 
-    // in schema, query fetches data, mutation changes it
+// in schema, query fetches data, mutation changes it
 
-module.exports = buildSchema(`
+const graphqlSchema = buildSchema(`
     scalar Date
 
     type Site {
@@ -76,7 +76,7 @@ module.exports = buildSchema(`
         speedIndex: MetricsData
         interactive: MetricsData
         firstCPUIdle: MetricsData
-        estimatedInputLatency: MetricsData
+        maxPotentialFid: MetricsData
     }
     type MetricsData {
         score: Float
@@ -104,10 +104,11 @@ module.exports = buildSchema(`
         speedIndex: AuditSchema
         interactive: AuditSchema!
         firstCpuIdle: AuditSchema!
-        estimatedInputLatency: AuditSchema!
+        maxPotentialFid: AuditSchema!
     }
     type PerformanceNoGroup {
-        maxPotentialFid: AuditSchema!
+        estimatedInputLatency: AuditSchema!
+        totalBlockingTime: AuditSchema!
         networkRequests: AuditSchema!
         networkRtt: AuditSchema!
         networkServerLatency: AuditSchema!
@@ -121,7 +122,7 @@ module.exports = buildSchema(`
         renderBlockingResources: AuditSchema!
         usesResponsiveImages: AuditSchema!
         offscreenImages: AuditSchema!
-        unminifiedVss: AuditSchema!
+        unminifiedCss: AuditSchema!
         unminifiedJavascript: AuditSchema!
         unusedCssRules: AuditSchema!
         usesOptimizedImages: AuditSchema!
@@ -142,6 +143,8 @@ module.exports = buildSchema(`
         bootupTime: AuditSchema!
         mainthreadWorkBreakdown: AuditSchema!
         fontDisplay: AuditSchema!
+        resourceSummary: AuditSchema!
+        thirdPartySummary: AuditSchema!
     }
 
     type SeoAudits {
@@ -159,6 +162,7 @@ module.exports = buildSchema(`
         documentTitle: AuditSchema!
         metaDescription: AuditSchema!
         linkText: AuditSchema!
+        imageAlt: AuditSchema!
         hreflang: AuditSchema!
         canonical: AuditSchema!
         plugins: AuditSchema!
@@ -236,11 +240,11 @@ module.exports = buildSchema(`
     }
     type AllyNoGroup {
         logicalTabOrder: AuditSchema!
-        focusableVontrols: AuditSchema!
+        focusableControls: AuditSchema!
         interactiveElementsAffordance: AuditSchema!
         managedFocus: AuditSchema!
         focusTraps: AuditSchema!
-        customCntrolsLabels: AuditSchema!
+        customControlsLabels: AuditSchema!
         customControlsRoles: AuditSchema!
         visualOrderFollowsDom: AuditSchema!
         offscreenContentHidden: AuditSchema!
@@ -254,7 +258,7 @@ module.exports = buildSchema(`
     type BestPracticesNoGroup {
         appcacheManifest: AuditSchema!
         isOnHttps: AuditSchema!
-        usesHttp: AuditSchema!
+        usesHttp2: AuditSchema!
         userPassiveEventListeners: AuditSchema!
         noDocumentWrite: AuditSchema!
         externalAnchorsUseRelNoopener: AuditSchema!
@@ -298,3 +302,5 @@ module.exports = buildSchema(`
         mutation: RootMutation
     }
 `);
+
+export default graphqlSchema;

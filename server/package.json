@@ -3,25 +3,34 @@
   "version": "0.0.0",
   "description": "Get various audits and save them to a database with a graphql interface to access the data",
   "main": "server.js",
+  "bin": {
+    "its": "dist/server.js"
+  },
   "dependencies": {
-    "apollo-server-express": "^2.5.0",
     "body-parser": "^1.19.0",
-    "chrome-launcher": "^0.10.7",
+    "chrome-launcher": "^0.12.0",
     "cors": "^2.8.5",
-    "express": "^4.17.0",
-    "express-graphql": "^0.8.0",
-    "graphql": "^14.3.0",
-    "graphql-tools": "^4.0.4",
-    "lighthouse": "^4.3.1",
+    "express": "^4.17.1",
+    "express-graphql": "^0.9.0",
+    "graphql": "^14.6.0",
+    "graphql-tools": "^4.0.6",
+    "lighthouse": "^5.6.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.5.9",
-    "puppeteer": "^1.16.0"
+    "mongoose": "^5.8.10",
+    "puppeteer": "^2.1.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "tsc && node dist/server.js",
+    "build-ts": "tsc"
   },
   "author": {
     "name": "Steve Meyer",
     "email": "sameyer17@gmail.com"
+  },
+  "devDependencies": {
+    "@types/graphql": "^14.5.0",
+    "@types/mongoose": "^5.7.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   }
 }

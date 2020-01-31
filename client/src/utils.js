@@ -1,8 +1,9 @@
 import ApolloClient from 'apollo-boost';
 
 const client = new ApolloClient({
-    uri: 'https://volence.dev/node_apps/lighthouse_app/graphql',
-    // uri: 'http://localhost:3501//graphql',
+    // uri: 'https://volence.dev/node_apps/lighthouse_app/graphql',
+    uri: 'http://localhost:3501//graphql',
+    // 100.11.206.213
 });
 
 const sendQuery = query => {
