@@ -1,9 +1,15 @@
+require('./models/Site');
+require('./models/ConsoleErrorAudits');
+require('./models/ConsoleErrorDetails');
+require('./models/LighthouseScores');
+require('./models/LighthouseAuditDetails');
+const CronJob = require('cron').CronJob;
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import graphqlHTTP from 'express-graphql';
-// import { runAudits } from './controllers/lighthouseController';
+import { runAudits } from './controllers/lighthouseController';
 
 import graphqlSchema from './graphql/schema/index';
 import graphqlResolvers from './graphql/resolvers/index';
@@ -37,7 +43,11 @@ app.use(
         schema: graphqlSchema,
         rootValue: graphqlResolvers,
         graphiql: true,
+        customFormatErrorFn: e => console.log('Connection error: ', e),
     })
 );
 
-// runAudits();
+const job = new CronJob('0 0 0 * * *', function() {
+    console.log('running cron', job);
+    runAudits();
+});

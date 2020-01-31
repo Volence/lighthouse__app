@@ -202,7 +202,7 @@ exports.runConsoleAuditsOnSingleSite = async siteName => {
             let productResponse = await checkConsolesForErrors([foundSite.productURL], 2000);
             await saveConsoleErrorResults(productResponse, siteName, 'product', foundSite.productURL, time);
             let response = [mainResponse, categoryResponse, productResponse];
-            console.log('Send complete');
+            console.log('Finished Saving All Errors!');
             return response;
         } else {
             throw new Error(`Sorry that site doesn't exist!`);

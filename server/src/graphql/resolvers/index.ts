@@ -1,6 +1,7 @@
 import Site from '../../models/Site';
 import ConsoleErrorAudits from '../../models/ConsoleErrorAudits';
 import moment from 'moment';
+import { runAudits } from '../../controllers/lighthouseController';
 const graphql = require('graphql');
 const graphqlLanguage = require('graphql/language');
 
@@ -71,6 +72,7 @@ const graphqlResolvers = {
             });
             let results = await site.save();
             console.log(`Saved ${args.siteInput.siteName} to the database!`);
+            runAudits(args.siteInput.siteName);
             return results;
         }
     },

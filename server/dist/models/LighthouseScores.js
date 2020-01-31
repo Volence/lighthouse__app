@@ -44,7 +44,7 @@ const lighthouseScoreSchema = new mongoose_1.default.Schema({
             score: Number,
             value: Number,
         },
-        estimatedInputLatency: {
+        maxPotentialFid: {
             score: Number,
             value: Number,
         },
