@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Switch, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     chart: {
         height: 'fit-content',
         width: '95%',
-        borderColor: 'black',
-        borderStyle: 'solid',
-        borderWidth: '1px',
         flexWrap: 'wrap',
         display: 'flex',
         margin: '1rem 0 0',
         paddingTop: '0.8rem',
         color: '#212121',
-        boxShadow: '1px 0 10px rgba(0, 0, 0, 0.3)',
+        overflowWrap: 'break-word',
+        backgroundColor: 'white',
         [theme.breakpoints.up('sm')]: {
             width: '85%',
         },
@@ -24,9 +21,14 @@ const useStyles = makeStyles(theme => ({
             width: '70%',
         },
     },
+    chartTitle: {
+        marginTop: '0.8rem',
+        paddingLeft: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+    },
     key: {
         backgroundColor: 'white',
-        border: '1px solid black',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -40,23 +42,52 @@ const useStyles = makeStyles(theme => ({
             width: '30%',
         },
     },
+    keyContainer: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    colorSwatch: {
+        width: '1rem',
+        height: '1rem',
+    },
+    colorSwatch1: {
+        backgroundColor: '#33ffb8',
+    },
+    colorSwatch2: {
+        backgroundColor: '#ff4200',
+    },
+    colorSwatch3: {
+        backgroundColor: '#0049ff',
+    },
+    colorSwatch4: {
+        backgroundColor: '#6833ff',
+    },
+    colorSwatch5: {
+        backgroundColor: '#cfc800',
+    },
+    colorSwatch6: {
+        backgroundColor: '#6b00cf',
+    },
 }));
 
 const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, interactive, firstCPUIdle, estimatedInputLatency }) => {
     const classes = useStyles();
-    const [viewerAmount, setViewerAmount] = useState(0);
-
-    const updateMinViewerAmount = e => {
-        setViewerAmount(e.target.value);
-    };
+    const [showFirstContentfulPaint, setShowFirstContentfulPaint] = useState(true);
+    const [showFirstMeaningfulPaint, setShowFirstMeaningfulPaint] = useState(true);
+    const [showSpeedIndex, setShowSpeedIndex] = useState(true);
+    const [showInteractive, setShowInteractive] = useState(true);
+    const [showFirstCPUIdle, setShowFirstCPUIdle] = useState(true);
+    const [showEstimatedInputLatency, setShowEstimatedInputLatency] = useState(true);
 
     return (
-        <Box className={classes.chart}>
-            <ChartTitle>
+        <Box boxShadow={2} className={classes.chart}>
+            <Box className={classes.chartTitle}>
                 <Typography variant="h5">{title}</Typography>
-            </ChartTitle>
+                <Typography variant="body1">Various Scores from the Performance Category</Typography>
+            </Box>
             <VictoryChart
-                minDomain={{ y: viewerAmount }}
+                minDomain={{ y: 0 }}
                 maxDomain={{ y: 100 }}
                 theme={VictoryTheme.material}
                 style={{
@@ -64,7 +95,7 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
                     labels: { fill: '#eeeeee' },
                 }}
                 animate={{
-                    duration: 1000,
+                    duration: 700,
                     onLoad: { duration: 500 },
                 }}
                 height={500}
@@ -72,134 +103,109 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
             >
                 <VictoryAxis dependentAxis />
                 <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 8 } }} />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#33FFB8', strokeWidth: 2.5 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={firstContentfulPaint}
-                />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#FF4200', strokeWidth: 2 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={firstMeaningfulPaint}
-                />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#0049FF', strokeWidth: 1.5 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={speedIndex}
-                />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#6833FF', strokeWidth: 1 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={interactive}
-                />
-                <VictoryLine
-                    width={1600}
-                    labels={datum => datum.y}
-                    style={{
-                        data: { stroke: '#CFC800', strokeWidth: 0.5 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={firstCPUIdle}
-                />
-                <VictoryLine
-                    width={1600}
-                    labels={datum => datum.y}
-                    style={{
-                        data: { stroke: '#6B00CF', strokeWidth: 0.25 },
-                        parent: { border: '1px solid #ccc' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={estimatedInputLatency}
-                />
+                {showFirstContentfulPaint && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#33FFB8', strokeWidth: 2.5 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={firstContentfulPaint}
+                    />
+                )}
+                {showFirstMeaningfulPaint && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#FF4200', strokeWidth: 2 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={firstMeaningfulPaint}
+                    />
+                )}
+                {showSpeedIndex && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#0049FF', strokeWidth: 1.5 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={speedIndex}
+                    />
+                )}
+                {showInteractive && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#6833FF', strokeWidth: 1 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={interactive}
+                    />
+                )}
+                {showFirstCPUIdle && (
+                    <VictoryLine
+                        width={1600}
+                        labels={datum => datum.y}
+                        style={{
+                            data: { stroke: '#CFC800', strokeWidth: 0.5 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={firstCPUIdle}
+                    />
+                )}
+                {showEstimatedInputLatency && (
+                    <VictoryLine
+                        width={1600}
+                        labels={datum => datum.y}
+                        style={{
+                            data: { stroke: '#6B00CF', strokeWidth: 0.25 },
+                            parent: { border: '1px solid #ccc' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={estimatedInputLatency}
+                    />
+                )}
             </VictoryChart>
             <Box className={classes.key}>
-                <FirstContentfulPaint>First Contentful Paint</FirstContentfulPaint>
-                <FirstMeaningfulPaint>First Meaningful Paint</FirstMeaningfulPaint>
-                <SpeedIndex>Speed Index</SpeedIndex>
-                <Interactive>Interactive</Interactive>
-                <FirstCPUIdle>First CPU Idle</FirstCPUIdle>
-                <EstimatedInputLatency>Estimated Input Latency</EstimatedInputLatency>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch1}`}></Box>
+                    <Switch color="primary" checked={showFirstContentfulPaint} onChange={e => setShowFirstContentfulPaint(e.target.checked)}></Switch>
+                    <Typography variant="h6">First Contentful Paint</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch2}`}></Box>
+                    <Switch color="primary" checked={showFirstMeaningfulPaint} onChange={e => setShowFirstMeaningfulPaint(e.target.checked)}></Switch>
+                    <Typography variant="h6">First Meaningful Paint</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch3}`}></Box>
+                    <Switch color="primary" checked={showSpeedIndex} onChange={e => setShowSpeedIndex(e.target.checked)}></Switch>
+                    <Typography variant="h6">Speed Index</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch4}`}></Box>
+                    <Switch color="primary" checked={showInteractive} onChange={e => setShowInteractive(e.target.checked)}></Switch>
+                    <Typography variant="h6">Interactive</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch5}`}></Box>
+                    <Switch color="primary" checked={showFirstCPUIdle} onChange={e => setShowFirstCPUIdle(e.target.checked)}></Switch>
+                    <Typography variant="h6">First CPU Idle</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch6}`}></Box>
+                    <Switch color="primary" checked={showEstimatedInputLatency} onChange={e => setShowEstimatedInputLatency(e.target.checked)}></Switch>
+                    <Typography variant="h6">Estimated Input Latency</Typography>
+                </Box>
             </Box>
-            {/* <SliderContainer>
-                <p>0</p>
-                <input type="range" name="spacing" onChange={e => updateMinViewerAmount(e)} min="0" max="100" value={viewerAmount} />
-                <p>100</p>
-            </SliderContainer> */}
         </Box>
     );
 };
-
-const Key = styled.div`
-    background-color: white;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
-    margin: 2rem auto;
-    box-shadow: 2px 0 8px black;
-`;
-
-const FirstContentfulPaint = styled.h5`
-    background-color: #33ffb8;
-    margin: 0;
-    width: 100%;
-`;
-const FirstMeaningfulPaint = styled.h5`
-    background-color: #ff4200;
-    margin: 0;
-    width: 100%;
-`;
-const SpeedIndex = styled.h5`
-    background-color: #0049ff;
-    margin: 0;
-    width: 100%;
-`;
-const Interactive = styled.h5`
-    background-color: #6833ff;
-    margin: 0;
-    width: 100%;
-`;
-const FirstCPUIdle = styled.h5`
-    background-color: #cfc800;
-    margin: 0;
-    width: 100%;
-`;
-const EstimatedInputLatency = styled.h5`
-    background-color: #6b00cf;
-    margin: 0;
-    width: 100%;
-`;
-
-const SliderContainer = styled.div`
-    display: flex;
-    margin: 0 auto;
-    width: fit-content;
-`;
-
-const ChartTitle = styled.code`
-    margin-top: 0.8rem;
-    padding-left: 2rem;
-    display: flex;
-    flex-direction: column;
-`;
 
 export default Chart;

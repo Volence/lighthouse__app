@@ -1,23 +1,19 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, Switch } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     chart: {
         height: 'fit-content',
         width: '95%',
-        borderColor: 'black',
-        borderStyle: 'solid',
-        borderWidth: '1px',
         flexWrap: 'wrap',
         display: 'flex',
         margin: '1rem 0 0',
         paddingTop: '0.8rem',
         color: '#212121',
         overflowWrap: 'break-word',
-        boxShadow: '1px 0 10px rgba(0, 0, 0, 0.3)',
+        backgroundColor: 'white',
         [theme.breakpoints.up('sm')]: {
             width: '85%',
         },
@@ -27,7 +23,6 @@ const useStyles = makeStyles(theme => ({
     },
     key: {
         backgroundColor: 'white',
-        border: '1px solid black',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -41,16 +36,42 @@ const useStyles = makeStyles(theme => ({
             width: '30%',
         },
     },
+    listErrorsSection: {
+        textAlign: 'left',
+        overflowWrap: 'breakWord',
+        width: '100%',
+    },
+    keyContainer: {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    colorSwatch: {
+        width: '1rem',
+        height: '1rem',
+    },
+    colorSwatch1: {
+        backgroundColor: '#ff8c00',
+    },
+    colorSwatch2: {
+        backgroundColor: '#ffcc00',
+    },
+    colorSwatch3: {
+        backgroundColor: '#c43a31',
+    },
 }));
 
 const Chart = ({ title, summary, errorData, warningData, failedRequestData, errors, warnings, failedRequests }) => {
     const classes = useStyles();
+    const [showErrors, setShowErrors] = useState(true);
+    const [showWarnings, setShowWarnings] = useState(true);
+    const [showFailedRequests, setShowFailedRequests] = useState(true);
     return (
-        <Box className={classes.chart}>
-            <ChartTitle>
+        <Box boxShadow={2} className={classes.chart}>
+            <Box className={classes.chartTitle}>
                 <Typography variant="h5">{title}</Typography>
                 <Typography variant="body1">{summary}</Typography>
-            </ChartTitle>
+            </Box>
             <VictoryChart
                 minDomain={{ y: 0 }}
                 maxDomain={{ y: 10 }}
@@ -60,7 +81,7 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                     labels: { fill: '#eeeeee' },
                 }}
                 animate={{
-                    duration: 1000,
+                    duration: 700,
                     onLoad: { duration: 500 },
                 }}
                 height={500}
@@ -68,41 +89,59 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
             >
                 <VictoryAxis dependentAxis />
                 <VictoryAxis style={{ tickLabels: { angle: -90, fontSize: 8 } }} />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#FF8C00', strokeWidth: 2 },
-                        parent: { border: '1px solid #eeeeee' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={failedRequestData}
-                />
-                <VictoryLine
-                    width={1600}
-                    style={{
-                        data: { stroke: '#FFCC00', strokeWidth: 1 },
-                        parent: { border: '1px solid #eeeeee' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={warningData}
-                />
-                <VictoryLine
-                    width={1600}
-                    labels={datum => datum.y}
-                    style={{
-                        data: { stroke: '#c43a31', strokeWidth: 0.5 },
-                        parent: { border: '1px solid #eeeeee' },
-                    }}
-                    labelComponent={<VictoryTooltip />}
-                    data={errorData}
-                />
+                {showErrors && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#FF8C00', strokeWidth: 2 },
+                            parent: { border: '1px solid #eeeeee' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={failedRequestData}
+                    />
+                )}
+                {showWarnings && (
+                    <VictoryLine
+                        width={1600}
+                        style={{
+                            data: { stroke: '#FFCC00', strokeWidth: 1 },
+                            parent: { border: '1px solid #eeeeee' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={warningData}
+                    />
+                )}
+                {showFailedRequests && (
+                    <VictoryLine
+                        width={1600}
+                        labels={datum => datum.y}
+                        style={{
+                            data: { stroke: '#c43a31', strokeWidth: 0.5 },
+                            parent: { border: '1px solid #eeeeee' },
+                        }}
+                        labelComponent={<VictoryTooltip />}
+                        data={errorData}
+                    />
+                )}
             </VictoryChart>
             <Box className={classes.key}>
-                <Errors>Errors</Errors>
-                <Warnings>Warnings</Warnings>
-                <FailedRequests>Failed Requests</FailedRequests>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch1}`}></Box>
+                    <Switch color="primary" checked={showErrors} onChange={e => setShowErrors(e.target.checked)}></Switch>
+                    <Typography variant="h6">Errors</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch2}`}></Box>
+                    <Switch color="primary" checked={showWarnings} onChange={e => setShowWarnings(e.target.checked)}></Switch>
+                    <Typography variant="h6">Warnings</Typography>
+                </Box>
+                <Box className={classes.keyContainer}>
+                    <Box className={`${classes.colorSwatch} ${classes.colorSwatch3}`}></Box>
+                    <Switch color="primary" checked={showFailedRequests} onChange={e => setShowFailedRequests(e.target.checked)}></Switch>
+                    <Typography variant="h6">Failed Requests</Typography>
+                </Box>
             </Box>
-            <ListErrorSection>
+            <Box className={classes.listErrorSection}>
                 {errors !== undefined && errors.length > 0 && (
                     <ul>
                         <Typography variant="h6">Errors:</Typography>{' '}
@@ -133,38 +172,9 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                         ))}
                     </ul>
                 )}
-            </ListErrorSection>
+            </Box>
         </Box>
     );
 };
-
-const Errors = styled.h5`
-    background-color: #ff8c00;
-    margin: 0;
-    width: 100%;
-`;
-const Warnings = styled.h5`
-    background-color: #ffcc00;
-    margin: 0;
-    width: 100%;
-`;
-const FailedRequests = styled.h5`
-    background-color: #c43a31;
-    margin: 0;
-    width: 100%;
-`;
-
-const ChartTitle = styled.code`
-    margin-top: 0.8rem;
-    padding-left: 2rem;
-    display: flex;
-    flex-direction: column;
-`;
-
-const ListErrorSection = styled.div`
-    text-align: left;
-    overflow-wrap: break-word;
-    width: 100%;
-`;
 
 export default Chart;

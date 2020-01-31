@@ -87,6 +87,7 @@ export default function SpringModal() {
                     <TextField
                         label="Site Name:"
                         type="text"
+                        margin="normal"
                         InputLabelProps={{
                             shrink: true,
                         }}
@@ -96,6 +97,7 @@ export default function SpringModal() {
                     <TextField
                         type="text"
                         label="Main URL:"
+                        margin="normal"
                         InputLabelProps={{
                             shrink: true,
                         }}
@@ -105,6 +107,7 @@ export default function SpringModal() {
                     <TextField
                         type="text"
                         label="Category URL:"
+                        margin="normal"
                         InputLabelProps={{
                             shrink: true,
                         }}
@@ -114,6 +117,7 @@ export default function SpringModal() {
                     <TextField
                         type="text"
                         label="Product URL:"
+                        margin="normal"
                         InputLabelProps={{
                             shrink: true,
                         }}
