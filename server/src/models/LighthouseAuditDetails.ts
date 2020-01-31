@@ -1,4 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { Moment } from 'moment';
+
+export interface LighthouseAuditDetailsType extends Document {
+    siteID?: string;
+    created?: Moment;
+    siteName?: string;
+    pageType?: string;
+    url?: string;
+    performanceAudits?: { [key: string]: any[] };
+    seoAudits?: { [key: string]: any[] };
+    accessibilityAudits?: { [key: string]: any[] };
+    bestPracticesAudits?: { [key: string]: any[] };
+}
 
 const LighthouseAuditDetails = new mongoose.Schema({
     siteID: {
@@ -15,4 +28,4 @@ const LighthouseAuditDetails = new mongoose.Schema({
     bestPracticesAudits: {},
 });
 
-export default mongoose.model('LighthouseAuditDetails', LighthouseAuditDetails);
+export default mongoose.model<LighthouseAuditDetailsType>('LighthouseAuditDetails', LighthouseAuditDetails);

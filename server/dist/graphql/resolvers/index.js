@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Site_1 = __importDefault(require("../../models/Site"));
 const ConsoleErrorAudits_1 = __importDefault(require("../../models/ConsoleErrorAudits"));
 const moment_1 = __importDefault(require("moment"));
-const graphql_1 = __importDefault(require("graphql"));
-const language_1 = __importDefault(require("graphql/language"));
+const graphql = require('graphql');
+const graphqlLanguage = require('graphql/language');
 const graphqlResolvers = {
     sites: async (args) => {
         try {
@@ -81,7 +81,7 @@ const graphqlResolvers = {
             return results;
         }
     },
-    Date: new graphql_1.default.GraphQLScalarType({
+    Date: new graphql.GraphQLScalarType({
         name: 'Date',
         description: 'Date custom scalar type',
         parseValue(value) {
@@ -91,7 +91,7 @@ const graphqlResolvers = {
             return value.getTime();
         },
         parseLiteral(ast) {
-            if (ast.kind === language_1.default.Kind.INT) {
+            if (ast.kind === graphqlLanguage.Kind.INT) {
                 return new Date(ast.value);
             }
             return null;

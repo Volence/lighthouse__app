@@ -75,7 +75,7 @@ const graphqlSchema = graphql_1.buildSchema(`
         speedIndex: MetricsData
         interactive: MetricsData
         firstCPUIdle: MetricsData
-        estimatedInputLatency: MetricsData
+        maxPotentialFid: MetricsData
     }
     type MetricsData {
         score: Float
@@ -103,10 +103,11 @@ const graphqlSchema = graphql_1.buildSchema(`
         speedIndex: AuditSchema
         interactive: AuditSchema!
         firstCpuIdle: AuditSchema!
-        estimatedInputLatency: AuditSchema!
+        maxPotentialFid: AuditSchema!
     }
     type PerformanceNoGroup {
-        maxPotentialFid: AuditSchema!
+        estimatedInputLatency: AuditSchema!
+        totalBlockingTime: AuditSchema!
         networkRequests: AuditSchema!
         networkRtt: AuditSchema!
         networkServerLatency: AuditSchema!
@@ -120,7 +121,7 @@ const graphqlSchema = graphql_1.buildSchema(`
         renderBlockingResources: AuditSchema!
         usesResponsiveImages: AuditSchema!
         offscreenImages: AuditSchema!
-        unminifiedVss: AuditSchema!
+        unminifiedCss: AuditSchema!
         unminifiedJavascript: AuditSchema!
         unusedCssRules: AuditSchema!
         usesOptimizedImages: AuditSchema!
@@ -141,6 +142,8 @@ const graphqlSchema = graphql_1.buildSchema(`
         bootupTime: AuditSchema!
         mainthreadWorkBreakdown: AuditSchema!
         fontDisplay: AuditSchema!
+        resourceSummary: AuditSchema!
+        thirdPartySummary: AuditSchema!
     }
 
     type SeoAudits {
@@ -158,6 +161,7 @@ const graphqlSchema = graphql_1.buildSchema(`
         documentTitle: AuditSchema!
         metaDescription: AuditSchema!
         linkText: AuditSchema!
+        imageAlt: AuditSchema!
         hreflang: AuditSchema!
         canonical: AuditSchema!
         plugins: AuditSchema!
@@ -235,11 +239,11 @@ const graphqlSchema = graphql_1.buildSchema(`
     }
     type AllyNoGroup {
         logicalTabOrder: AuditSchema!
-        focusableVontrols: AuditSchema!
+        focusableControls: AuditSchema!
         interactiveElementsAffordance: AuditSchema!
         managedFocus: AuditSchema!
         focusTraps: AuditSchema!
-        customCntrolsLabels: AuditSchema!
+        customControlsLabels: AuditSchema!
         customControlsRoles: AuditSchema!
         visualOrderFollowsDom: AuditSchema!
         offscreenContentHidden: AuditSchema!
@@ -253,7 +257,7 @@ const graphqlSchema = graphql_1.buildSchema(`
     type BestPracticesNoGroup {
         appcacheManifest: AuditSchema!
         isOnHttps: AuditSchema!
-        usesHttp: AuditSchema!
+        usesHttp2: AuditSchema!
         userPassiveEventListeners: AuditSchema!
         noDocumentWrite: AuditSchema!
         externalAnchorsUseRelNoopener: AuditSchema!

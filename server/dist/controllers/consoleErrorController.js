@@ -3,16 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const Site = mongoose_1.default.model('Site');
-const ConsoleErrorAudit = mongoose_1.default.model('ConsoleErrorAudit');
-const ConsoleErrorDetails = mongoose_1.default.model('ConsoleErrorDetails');
+const Site_1 = __importDefault(require("../models/Site"));
+const ConsoleErrorDetails_1 = __importDefault(require("../models/ConsoleErrorDetails"));
+const ConsoleErrorAudits_1 = __importDefault(require("../models/ConsoleErrorAudits"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const moment_1 = __importDefault(require("moment"));
 const saveConsoleErrorResults = async (response, siteName, pageType, URL, timeCreated) => {
     try {
-        const site = await Site.findOne({ siteName: siteName });
-        const consoleErrorAudit = new ConsoleErrorAudit({
+        const site = await Site_1.default.findOne({ siteName: siteName });
+        if (site === null)
+            return 'No site found!';
+        const consoleErrorAudit = new ConsoleErrorAudits_1.default({
             siteID: site._id,
             created: timeCreated,
             siteName: siteName,
@@ -34,13 +35,13 @@ const saveConsoleErrorResults = async (response, siteName, pageType, URL, timeCr
             failedRequestsText: response[URL].failedRequests,
         };
         const queryParam = { siteName: siteName, pageType: pageType };
-        const existingDetails = await ConsoleErrorDetails.findOne(queryParam);
+        const existingDetails = await ConsoleErrorDetails_1.default.findOne(queryParam);
         if (existingDetails) {
             await existingDetails.update({ ...consoleErrorDetailsContent });
             console.log(`Updated ${siteName}'s ${pageType} error details!`);
         }
         else {
-            const consoleErrorDetails = new ConsoleErrorDetails(consoleErrorDetailsContent);
+            const consoleErrorDetails = new ConsoleErrorDetails_1.default(consoleErrorDetailsContent);
             await consoleErrorDetails.save();
             site[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
         }
@@ -56,15 +57,19 @@ const saveConsoleErrorResults = async (response, siteName, pageType, URL, timeCr
 };
 const getErrorAudits = async (site) => {
     try {
-        let response = {};
-        let queryParam = {};
-        queryParam.siteName = site.siteName;
-        queryParam.pageType = 'main';
-        response.main = await ConsoleErrorAudit.find(queryParam);
+        let queryParam = {
+            siteName: site.siteName,
+            pageType: 'main',
+        };
+        let response = {
+            main: await ConsoleErrorAudits_1.default.find(queryParam),
+            category: [],
+            products: [],
+        };
         queryParam.pageType = 'category';
-        response.category = await ConsoleErrorAudit.find(queryParam);
+        response.category = await ConsoleErrorAudits_1.default.find(queryParam);
         queryParam.pageType = 'product';
-        response.products = await ConsoleErrorAudit.find(queryParam);
+        response.products = await ConsoleErrorAudits_1.default.find(queryParam);
         return response;
     }
     catch (err) {
@@ -74,7 +79,9 @@ const getErrorAudits = async (site) => {
 const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
     try {
         let response = {};
-        await utils.asyncForEach(urls, async (url) => {
+        const runConsoleAudits = async ([url, ...urls]) => {
+            if (url === undefined)
+                return;
             console.log(`Checking for errors on ${url}...`);
             let errorCount = 0;
             let errors = [];
@@ -118,33 +125,21 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
                 warnings: warnings,
                 failedRequests: failedRequests,
             };
-        });
+            return await runConsoleAudits(urls);
+        };
+        await runConsoleAudits(urls);
         return response;
     }
     catch (err) {
         return err;
     }
 };
-const getAllSitesErrorAudits = async () => {
+exports.getSiteErrorAudits = async (siteEntered) => {
     try {
-        const sites = await Site.find();
-        let response = {};
-        await utils.asyncForEach(sites, async (site) => {
-            console.log(`Pulling console error data from ${site.siteName}`);
-            let siteName = site.siteName;
-            response[siteName] = await getErrorAudits(site);
-        });
-        return;
-    }
-    catch (err) {
-        throw err;
-    }
-};
-exports.getSiteErrorAudits = async () => {
-    try {
-        let queryParam = {};
-        queryParam.siteName = req.params.site;
-        const site = await Site.findOne(queryParam);
+        let queryParam = { siteName: siteEntered };
+        const site = await Site_1.default.findOne(queryParam);
+        if (site === null)
+            return 'Site not Found';
         let response = {};
         let siteName = site.siteName;
         console.log(`Pulling console error data from ${siteName}`);
@@ -157,9 +152,11 @@ exports.getSiteErrorAudits = async () => {
 };
 exports.runConsoleAuditsOnAll = async () => {
     try {
-        let sites = await Site.find();
+        let sites = await Site_1.default.find();
         let response = {};
-        await utils.asyncForEach(sites, async (site) => {
+        const runSiteAudit = async ([site, ...sites]) => {
+            if (site === undefined)
+                return;
             let time = moment_1.default.utc();
             let mainResponse = await checkConsolesForErrors([site.mainURL], 2000);
             await saveConsoleErrorResults(mainResponse, site.siteName, 'main', site.mainURL, time);
@@ -168,17 +165,18 @@ exports.runConsoleAuditsOnAll = async () => {
             let productResponse = await checkConsolesForErrors([site.productURL], 2000);
             await saveConsoleErrorResults(productResponse, site.siteName, 'product', site.productURL, time);
             response[site.siteName] = [mainResponse, categoryResponse, productResponse];
-        });
+            return await runSiteAudit(sites);
+        };
+        await runSiteAudit(sites);
         return response;
     }
     catch (err) {
         throw err;
     }
 };
-exports.runConsoleAuditsOnSingleSite = async () => {
+exports.runConsoleAuditsOnSingleSite = async (siteName) => {
     try {
-        let siteName = req.body.siteName.toLowerCase();
-        let foundSite = await Site.findOne({ siteName: siteName });
+        let foundSite = await Site_1.default.findOne({ siteName: siteName });
         if (foundSite) {
             let time = moment_1.default.utc();
             let mainResponse = await checkConsolesForErrors([foundSite.mainURL], 2000);
@@ -201,9 +199,14 @@ exports.runConsoleAuditsOnSingleSite = async () => {
 };
 exports.runAllAudits = async () => {
     try {
-        let sites = await Site.find();
+        let sites = await Site_1.default.find();
         let response = {};
-        await utils.asyncForEach(sites, async (site) => {
+        let siteCount = 0;
+        const siteTotal = sites.length;
+        const runSiteAudit = async ([site, ...sites]) => {
+            if (site === undefined)
+                return;
+            siteCount++;
             let time = moment_1.default.utc();
             let mainResponse = await checkConsolesForErrors([site.mainURL], 2000);
             await saveConsoleErrorResults(mainResponse, site.siteName, 'main', site.mainURL, time);
@@ -212,8 +215,10 @@ exports.runAllAudits = async () => {
             let productResponse = await checkConsolesForErrors([site.productURL], 2000);
             await saveConsoleErrorResults(productResponse, site.siteName, 'product', site.productURL, time);
             response[site.siteName] = [mainResponse, categoryResponse, productResponse];
-            console.log(`---ConsoleAuditErrors: ${sites.indexOf(site) + 1} out of ${sites.length} sites complete`);
-        });
+            console.log(`---ConsoleAuditErrors: ${siteCount} out of ${siteTotal} sites complete`);
+            return await runSiteAudit(sites);
+        };
+        await runSiteAudit(sites);
         return response;
     }
     catch (err) {

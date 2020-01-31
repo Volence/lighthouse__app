@@ -1,8 +1,8 @@
 import Site from '../../models/Site';
 import ConsoleErrorAudits from '../../models/ConsoleErrorAudits';
 import moment from 'moment';
-import graphql from 'graphql';
-import graphqlLanguage from 'graphql/language';
+const graphql = require('graphql');
+const graphqlLanguage = require('graphql/language');
 
 const graphqlResolvers = {
     sites: async (args: Arguments) => {

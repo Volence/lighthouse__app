@@ -25,3 +25,15 @@ interface ConsoleErrorDetails {
     warnings?: string[];
     failedRequests?: string[];
 }
+
+interface LighthouseAuditDetailsType {
+    siteID?: string;
+    created?: Date;
+    siteName?: string;
+    pageType?: string;
+    url?: string;
+    performanceAudits?: { [key: string]: any[] };
+    seoAudits?: { [key: string]: any[] };
+    accessibilityAudits?: { [key: string]: any[] };
+    bestPracticesAudits?: { [key: string]: any[] };
+}

@@ -1,13 +1,9 @@
-require('./models/Site');
-require('./models/ConsoleErrorAudits');
-require('./models/ConsoleErrorDetails');
-require('./models/LighthouseScores');
-require('./models/LighthouseAuditDetails');
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import graphqlHTTP from 'express-graphql';
+// import { runAudits } from './controllers/lighthouseController';
 
 import graphqlSchema from './graphql/schema/index';
 import graphqlResolvers from './graphql/resolvers/index';
@@ -43,3 +39,5 @@ app.use(
         graphiql: true,
     })
 );
+
+// runAudits();

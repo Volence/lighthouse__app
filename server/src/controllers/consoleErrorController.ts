@@ -1,16 +1,15 @@
-import mongoose, { Document } from 'mongoose';
-import { ConsoleErrorDetailsType } from '../models/ConsoleErrorDetails';
-const Site = mongoose.model('Site');
-const ConsoleErrorAudit = mongoose.model('ConsoleErrorAudit');
-const ConsoleErrorDetails = mongoose.model('ConsoleErrorDetails');
+import Site from '../models/Site';
+import ConsoleErrorDetails from '../models/ConsoleErrorDetails';
+import ConsoleErrorAudit, { ConsoleErrorType } from '../models/ConsoleErrorAudits';
 import puppeteer from 'puppeteer';
 import moment, { Moment } from 'moment';
 
 const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, siteName: string, pageType: string, URL: string, timeCreated: Moment): Promise<string> => {
     try {
         const site = await Site.findOne({ siteName: siteName });
+        if (site === null) return 'No site found!';
         const consoleErrorAudit = new ConsoleErrorAudit({
-            siteID: (site as Document)._id,
+            siteID: site._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
@@ -20,7 +19,7 @@ const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, 
             failedRequestCount: response[URL].failedRequestCount,
         });
         const consoleErrorDetailsContent = {
-            siteID: (site as Document)._id,
+            siteID: site._id,
             created: timeCreated,
             siteName: siteName,
             pageType: pageType,
@@ -38,11 +37,11 @@ const saveConsoleErrorResults = async (response: ConsoleErrorDetailsBySiteName, 
         } else {
             const consoleErrorDetails = new ConsoleErrorDetails(consoleErrorDetailsContent);
             await consoleErrorDetails.save();
-            (site as Document)[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
+            site[`${pageType}URLAuditDetails`].push(consoleErrorDetails);
         }
         await consoleErrorAudit.save();
-        (site as Document)[`${pageType}URLAudits`].push(consoleErrorAudit);
-        await (site as mongoose.Document).save();
+        site[`${pageType}URLAudits`].push(consoleErrorAudit);
+        await site.save();
         console.log(`Saved ${siteName}'s ${pageType} console error's summary!`);
         return 'Complete!';
     } catch (err) {
@@ -58,8 +57,8 @@ const getErrorAudits = async site => {
         };
         let response = {
             main: await ConsoleErrorAudit.find(queryParam),
-            category: [] as Document[],
-            products: [] as Document[],
+            category: [] as ConsoleErrorType[],
+            products: [] as ConsoleErrorType[],
         };
         queryParam.pageType = 'category';
         response.category = await ConsoleErrorAudit.find(queryParam);
@@ -135,31 +134,30 @@ const checkConsolesForErrors = async (urls, timeToWaitOnPage = 2000) => {
     }
 };
 
-const getAllSitesErrorAudits = async () => {
-    try {
-        const sites = await Site.find();
-        let response = {};
-        const runSiteAudit = async ([site, ...sites]: any[]) => {
-            if (site === undefined) return;
-            console.log(`Pulling console error data from ${site.siteName}`);
-            let siteName = site.siteName;
-            response[siteName] = await getErrorAudits(site);
-            return runSiteAudit(sites);
-        };
-        await runSiteAudit(sites);
-        return;
-    } catch (err) {
-        throw err;
-    }
-};
+// const getAllSitesErrorAudits = async () => {
+//     try {
+//         const sites = await Site.find();
+//         let response = {};
+//         const runSiteAudit = async ([site, ...sites]: any[]) => {
+//             if (site === undefined) return;
+//             console.log(`Pulling console error data from ${site.siteName}`);
+//             let siteName = site.siteName;
+//             response[siteName] = await getErrorAudits(site);
+//             return runSiteAudit(sites);
+//         };
+//         await runSiteAudit(sites);
+//         return;
+//     } catch (err) {
+//         throw err;
+//     }
+// };
 
 exports.getSiteErrorAudits = async siteEntered => {
     try {
         let queryParam = { siteName: siteEntered };
         const site = await Site.findOne(queryParam);
+        if (site === null) return 'Site not Found';
         let response = {};
-        // Need to fix this but can't figure out why it's not responding correctly to the type
-        // @ts-ignore
         let siteName = site.siteName;
         console.log(`Pulling console error data from ${siteName}`);
         response[siteName] = await getErrorAudits(site);
@@ -219,8 +217,11 @@ exports.runAllAudits = async () => {
     try {
         let sites = await Site.find();
         let response = {};
+        let siteCount = 0;
+        const siteTotal = sites.length;
         const runSiteAudit = async ([site, ...sites]: any[]) => {
             if (site === undefined) return;
+            siteCount++;
             let time = moment.utc();
             let mainResponse = await checkConsolesForErrors([site.mainURL], 2000);
             await saveConsoleErrorResults(mainResponse, site.siteName, 'main', site.mainURL, time);
@@ -229,7 +230,7 @@ exports.runAllAudits = async () => {
             let productResponse = await checkConsolesForErrors([site.productURL], 2000);
             await saveConsoleErrorResults(productResponse, site.siteName, 'product', site.productURL, time);
             response[site.siteName] = [mainResponse, categoryResponse, productResponse];
-            console.log(`---ConsoleAuditErrors: ${sites.indexOf(site) + 1} out of ${sites.length} sites complete`);
+            console.log(`---ConsoleAuditErrors: ${siteCount} out of ${siteTotal} sites complete`);
             return await runSiteAudit(sites);
         };
         await runSiteAudit(sites);
