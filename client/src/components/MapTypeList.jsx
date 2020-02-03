@@ -8,7 +8,7 @@ const typeToolTips = [
     'First Contentful Paint, First Meaningful Paint, Speed Index, Time to Interactive, First CPU Idle, and Estimated Input Latency from page',
 ];
 
-const MapTypeList = ({ currentSelectedSite, setDisplayType, setCurrentSiteDisplayed, setDisplayData }) => {
+const MapTypeList = ({ currentSelectedSite, setDisplayType, setCurrentSiteDisplayed, setDisplayData, isDisabled }) => {
     return (
         <List>
             {['Errors', 'Metrics', 'Scores'].map((text, index) => (
@@ -16,6 +16,7 @@ const MapTypeList = ({ currentSelectedSite, setDisplayType, setCurrentSiteDispla
                     <ListItem
                         button
                         key={text}
+                        disabled={isDisabled}
                         onClick={async e => {
                             if (currentSelectedSite === 'Select Site') return;
                             setDisplayType(text);
