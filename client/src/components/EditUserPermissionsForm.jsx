@@ -69,7 +69,7 @@ const EditUserPermissionsForm = ({ name, handleOpen, open, handleClose, tooltip 
                         options={userList ? userList.sort((a, b) => -b.email.localeCompare(a.email)) : userList}
                         getOptionLabel={option => option.email}
                         style={{ width: 300 }}
-                        renderInput={params => <TextField {...params} label="Combo box" variant="outlined" fullWidth />}
+                        renderInput={params => <TextField {...params} label="Select a User" variant="outlined" fullWidth />}
                     />
                     <DialogActions>
                         <Button
