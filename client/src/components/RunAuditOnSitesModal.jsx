@@ -66,7 +66,7 @@ const RunAuditOnSitesModal = ({ name, handleOpen, open, handleClose, sites, tool
                             id="combo-box-demo"
                             options={sites ? sites.sort((a, b) => -b.siteName.localeCompare(a.siteName)) : sites}
                             style={{ width: 300 }}
-                            renderInput={params => <TextField {...params} label="Combo box" variant="outlined" fullWidth />}
+                            renderInput={params => <TextField {...params} label="Select Sites" variant="outlined" fullWidth />}
                         />
                         <DialogActions>
                             {sitesSelected.length > 0 && (
