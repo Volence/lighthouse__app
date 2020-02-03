@@ -160,7 +160,7 @@ const Chart = ({ title, firstContentfulPaint, firstMeaningfulPaint, speedIndex, 
                         data={firstCPUIdle}
                     />
                 )}
-                {maxPotentialFid && (
+                {showMaxPotentialFid && (
                     <VictoryLine
                         width={1600}
                         labels={datum => datum.y}
