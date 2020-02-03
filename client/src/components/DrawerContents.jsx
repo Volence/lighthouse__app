@@ -66,9 +66,10 @@ const DrawerContents = ({
         <>
             <div className={classes.toolbar} />
             <Divider />
-            <PageTypeList setChartNumber={setChartNumber} />
+            <PageTypeList isDisabled={currentSelectedSite === 'Select Site' ? true : false} setChartNumber={setChartNumber} />
             <Divider />
             <MapTypeList
+                isDisabled={currentSelectedSite === 'Select Site' ? true : false}
                 setDisplayType={setDisplayType}
                 setCurrentSiteDisplayed={setCurrentSiteDisplayed}
                 currentSelectedSite={currentSelectedSite}
