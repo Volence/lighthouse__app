@@ -68,6 +68,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Chart = ({ title, summary, errorData, warningData, failedRequestData, errors, warnings, failedRequests }) => {
+    console.log('errorData', warningData);
     const classes = useStyles();
     const [showErrors, setShowErrors] = useState(true);
     const [showWarnings, setShowWarnings] = useState(true);
@@ -81,7 +82,7 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
             <VictoryChart
                 containerComponent={<VictoryZoomContainer />}
                 minDomain={{ y: 0 }}
-                maxDomain={{ y: 10 }}
+                maxDomain={{ y: Math.max(...errorData.map(e => e.y), ...warningData.map(e => e.y), ...failedRequestData.map(e => e.y)) + 1 }}
                 theme={VictoryTheme.material}
                 style={{
                     data: { fill: '#eeeeee' },
