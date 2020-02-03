@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip } from 'victory';
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryTooltip, VictoryZoomContainer } from 'victory';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Typography, Switch } from '@material-ui/core';
 
@@ -79,6 +79,7 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
                 <Typography variant="body1">{summary}</Typography>
             </Box>
             <VictoryChart
+                containerComponent={<VictoryZoomContainer />}
                 minDomain={{ y: 0 }}
                 maxDomain={{ y: 10 }}
                 theme={VictoryTheme.material}

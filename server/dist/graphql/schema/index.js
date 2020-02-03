@@ -289,11 +289,37 @@ const graphqlSchema = graphql_1.buildSchema(`
 
     type RootQuery {
         sites(siteName: String): [Site!]!
+        users: [ClientData]!
         consoleErrorAudits(siteName: String): [ConsoleErrorAudits!]!
+    }
+    input SignInData {
+        userName: String
+        email: String!
+        clientToken: String!
+        userID: String!
+    }
+
+    type ClientData {
+        userName: String
+        created: Date
+        lastSignIn: Date
+        email: String
+        error: String
+        userID: String
+        userType: String
+    }
+
+    type AdminEdit {
+        error: String
+        success: String
     }
 
     type RootMutation {
         createSite(siteInput: SiteInput): Site
+        runSiteAudits(siteName: [String]): AdminEdit
+        signIn(clientData: SignInData): ClientData
+        addAdmin(email: String!): AdminEdit
+        removeAdmin(email: String!): AdminEdit
     }
 
     schema {

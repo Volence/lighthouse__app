@@ -47,7 +47,9 @@ app.use(
     })
 );
 
-const job = new CronJob('0 0 0 * * *', function() {
+const job = new CronJob('0 0 0 * * 0', function() {
     console.log('running cron', job);
     runAudits();
 });
+
+job.start();

@@ -61,7 +61,6 @@ const TopBar = ({ handleDrawerToggle, sites, setCurrentSelectedSite, setCurrentS
                         Lighthouse App
                     </Typography>
                 </Box>
-                {/* <Button color="inherit">Login</Button> */}
                 <Autocomplete
                     id="combo-box-demo"
                     className={classes.siteSelectionContainer}
