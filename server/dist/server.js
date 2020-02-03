@@ -41,8 +41,9 @@ app.use('//graphql', express_graphql_1.default({
     graphiql: true,
     customFormatErrorFn: e => console.log('Connection error: ', e),
 }));
-const job = new CronJob('0 0 0 * * *', function () {
+const job = new CronJob('0 0 0 * * 0', function () {
     console.log('running cron', job);
     lighthouseController_1.runAudits();
 });
+job.start();
 //# sourceMappingURL=server.js.map

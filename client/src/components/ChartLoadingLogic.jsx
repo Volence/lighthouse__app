@@ -2,7 +2,7 @@ import AuditChart from './ErrorsCharts';
 import ScoresChart from './MetricsCharts';
 import MetricsChart from './ScoresCarts';
 import { sendQuery } from '../utils';
-import * as customQueries from '../gql/queries';
+import { getSiteErrorAuditData, getSiteScores, getMetricScores } from '../gql/queries';
 import React from 'react';
 import moment from 'moment';
 
@@ -27,7 +27,6 @@ const setScoresForChart = (arr, type) => {
 };
 
 const setMetricsForChart = (arr, type) => {
-    console.log('type', type);
     let data = [];
     arr.forEach(element => {
         data.push({ x: moment(element.created).format('MM-DD-YYYY--HH:mm:ss'), y: element.metrics[type].score * 100 });
@@ -40,7 +39,7 @@ const loadSiteErrors = async site => {
         data: {
             sites: [data],
         },
-    } = await sendQuery(customQueries.getSiteErrorAuditData(site));
+    } = await sendQuery(getSiteErrorAuditData(site));
 
     const sortedMain = sortByCreated(data.mainURLAudits);
     const sortedCategory = sortByCreated(data.categoryURLAudits);
@@ -118,7 +117,7 @@ const loadSiteScores = async site => {
         data: {
             sites: [data],
         },
-    } = await sendQuery(customQueries.getSiteScores(site));
+    } = await sendQuery(getSiteScores(site));
 
     const sortedMain = sortByCreated(data.mainURLLighthouseScores);
     const sortedCategory = sortByCreated(data.categoryURLLighthouseScores);
@@ -177,7 +176,7 @@ const loadSiteMetrics = async site => {
         data: {
             sites: [data],
         },
-    } = await sendQuery(customQueries.getMetricScores(site));
+    } = await sendQuery(getMetricScores(site));
 
     const sortedMain = sortByCreated(data.mainURLLighthouseScores);
     const sortedCategory = sortByCreated(data.categoryURLLighthouseScores);

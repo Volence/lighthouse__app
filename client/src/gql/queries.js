@@ -1,13 +1,13 @@
 import gql from 'graphql-tag';
 
-export const getSiteNames = gql`
-{
-  sites {
-    siteName
-  }
-}
+const getSiteNames = gql`
+    {
+        sites {
+            siteName
+        }
+    }
 `;
-export const getSpecificSite = site => gql`
+const getSpecificSite = site => gql`
   {
     sites(siteName: "${site}") {
       mainURLAudits {
@@ -17,15 +17,65 @@ export const getSpecificSite = site => gql`
   }
 `;
 
-export const createSite = gql`
+const createSite = gql`
     mutation createSite($siteInput: SiteInput!) {
         createSite(siteInput: $siteInput) {
             siteName
-        } 
+        }
     }
 `;
 
-export const getSiteErrorAuditData = site => gql`
+const addAdmin = gql`
+    mutation addAdmin($email: String!) {
+        addAdmin(email: $email) {
+            error
+            success
+        }
+    }
+`;
+const removeAdmin = gql`
+    mutation removeAdmin($email: String!) {
+        removeAdmin(email: $email) {
+            error
+            success
+        }
+    }
+`;
+
+const getUsers = gql`
+    {
+        users {
+            userName
+            email
+            userType
+        }
+    }
+`;
+
+const signIn = gql`
+    mutation signIn($clientData: SignInData!) {
+        signIn(clientData: $clientData) {
+            userName
+            created
+            lastSignIn
+            email
+            userID
+            error
+            userType
+        }
+    }
+`;
+
+const runSiteAudits = gql`
+    mutation signIn($siteName: [String]) {
+        runSiteAudits(siteName: $siteName) {
+            error
+            success
+        }
+    }
+`;
+
+const getSiteErrorAuditData = site => gql`
   {
   sites(siteName: "${site}") {
     mainURLAudits {
@@ -68,7 +118,7 @@ export const getSiteErrorAuditData = site => gql`
 }
 `;
 
-export const getSiteScores = site => gql`
+const getSiteScores = site => gql`
 {
   sites(siteName: "${site}") {
 		mainURLLighthouseScores {
@@ -101,7 +151,7 @@ export const getSiteScores = site => gql`
   }
 }
 `;
-export const getMetricScores = site => gql`
+const getMetricScores = site => gql`
 {
   sites(siteName: "${site}") {
     mainURLLighthouseScores {
@@ -176,3 +226,17 @@ export const getMetricScores = site => gql`
   }
 }
 `;
+
+export {
+    getSiteNames,
+    getSpecificSite,
+    createSite,
+    getUsers,
+    signIn,
+    getSiteErrorAuditData,
+    getSiteScores,
+    getMetricScores,
+    addAdmin,
+    removeAdmin,
+    runSiteAudits,
+};

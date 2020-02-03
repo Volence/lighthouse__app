@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import TopBar from './components/TopBar';
 import SideBar from './components/SideBar';
 import MainPanel from './components/MainPanel';
-import * as customQueries from './gql/queries';
+import Cookies from 'js-cookie';
+import { getSiteNames } from './gql/queries';
 import { Box, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { sendQuery } from './utils';
+import { sendQuery, AppoloWrapper } from './utils';
 
 // Styles
 const useStyles = makeStyles(theme => ({
@@ -37,6 +37,8 @@ const App = () => {
     const classes = useStyles();
 
     const [sites, setSites] = useState();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userType, setUserType] = useState('Basic');
     const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
     const [currentSiteDisplayed, setCurrentSiteDisplayed] = useState(<Typography variant="h5">Site:</Typography>);
     const [chartNumber, setChartNumber] = useState(0);
@@ -53,7 +55,7 @@ const App = () => {
     useEffect(() => {
         // Queries
         const getSites = async () => {
-            let { data } = await sendQuery(customQueries.getSiteNames);
+            let { data } = await sendQuery(getSiteNames);
             return data.sites;
         };
 
@@ -67,6 +69,18 @@ const App = () => {
             displaySiteList(siteList);
         };
 
+        const checkLoginStatus = async () => {
+            const loggedIn = Cookies.get('loggedIn') == 'true' ? true : false;
+            if (loggedIn !== true) {
+                Cookies.set('loggedIn', false);
+                setIsLoggedIn(false);
+                return;
+            }
+            setUserType(Cookies.get('userType'));
+            setIsLoggedIn(true);
+        };
+
+        checkLoginStatus();
         getAndSetSites();
     }, []);
 
@@ -75,27 +89,34 @@ const App = () => {
     };
 
     return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <TopBar
-                setDisplayData={setDisplayData}
-                handleDrawerToggle={handleDrawerToggle}
-                sites={sites}
-                setCurrentSelectedSite={setCurrentSelectedSite}
-                setCurrentSiteDisplayed={setCurrentSiteDisplayed}
-                displayType={displayType}
-            />
-            <SideBar
-                handleDrawerToggle={handleDrawerToggle}
-                mobileDrawerOpen={mobileDrawerOpen}
-                setChartNumber={setChartNumber}
-                currentSelectedSite={currentSelectedSite}
-                setDisplayType={setDisplayType}
-                setCurrentSiteDisplayed={setCurrentSiteDisplayed}
-                setDisplayData={setDisplayData}
-            />
-            <MainPanel currentSiteDisplayed={currentSiteDisplayed} chartNumber={chartNumber} displayData={displayData} />
-        </div>
+        <AppoloWrapper>
+            <div className={classes.root}>
+                <CssBaseline />
+                <TopBar
+                    setDisplayData={setDisplayData}
+                    handleDrawerToggle={handleDrawerToggle}
+                    sites={sites}
+                    setCurrentSelectedSite={setCurrentSelectedSite}
+                    setCurrentSiteDisplayed={setCurrentSiteDisplayed}
+                    displayType={displayType}
+                />
+                <SideBar
+                    sites={sites}
+                    handleDrawerToggle={handleDrawerToggle}
+                    mobileDrawerOpen={mobileDrawerOpen}
+                    setChartNumber={setChartNumber}
+                    currentSelectedSite={currentSelectedSite}
+                    setDisplayType={setDisplayType}
+                    setCurrentSiteDisplayed={setCurrentSiteDisplayed}
+                    setDisplayData={setDisplayData}
+                    userType={userType}
+                    setUserType={setUserType}
+                    isLoggedIn={isLoggedIn}
+                    setIsLoggedIn={setIsLoggedIn}
+                />
+                <MainPanel currentSiteDisplayed={currentSiteDisplayed} chartNumber={chartNumber} displayData={displayData} />
+            </div>
+        </AppoloWrapper>
     );
 };
 

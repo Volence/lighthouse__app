@@ -1,9 +1,13 @@
 import React from 'react';
-import Modal from './Modal';
-import { loadSiteErrors, loadSiteMetrics, loadSiteScores } from './ChartLoadingLogic';
-import { Typography, Divider, List, ListItem, ListItemText, Tooltip } from '@material-ui/core';
+import AdminCommands from './AdminCommands';
+import { Divider } from '@material-ui/core';
+import MapTypeList from './MapTypeList';
+import PageTypeList from './PageTypeList';
 import { makeStyles } from '@material-ui/core/styles';
-import GoogleLogin from 'react-google-login';
+import GoogleLogin, { GoogleLogout } from 'react-google-login';
+import { sendSignInMutation } from '../utils';
+import Cookies from 'js-cookie';
+import { signIn } from '../gql/queries';
 
 const useStyles = makeStyles(theme => ({
     toolbar: theme.mixins.toolbar,
@@ -12,81 +16,78 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const pageToolTips = ['The Main Page', 'The Category Page', 'The Product Page'];
-const typeToolTips = [
-    'Errors, Warnings, and Failed Requests from the console of a page.',
-    'Performance, Accessibility, Best Practices, and Seo scores from the page.',
-    'First Contentful Paint, First Meaningful Paint, Speed Index, Time to Interactive, First CPU Idle, and Estimated Input Latency from page',
-];
-const addSiteToolTips = 'Add a new site to the database';
-
-const DrawerContents = ({ setChartNumber, currentSelectedSite, setDisplayType, setCurrentSiteDisplayed, setDisplayData }) => {
+const DrawerContents = ({
+    setChartNumber,
+    currentSelectedSite,
+    setDisplayType,
+    setCurrentSiteDisplayed,
+    setDisplayData,
+    userType,
+    setUserType,
+    isLoggedIn,
+    setIsLoggedIn,
+    sites,
+}) => {
     const classes = useStyles();
-    const responseGoogle = response => {
-        console.log('response', response);
+    const login = async googleResponse => {
+        const userData = {
+            userName: googleResponse.profileObj.name,
+            email: googleResponse.profileObj.email,
+            clientToken: googleResponse.tokenId,
+            userID: googleResponse.googleId,
+        };
+        const response = await sendSignInMutation(signIn, userData);
+        if (response.data.signIn.error !== null) {
+            alert('Error, please try to sign in at a later time!');
+            return;
+        }
+        Cookies.set('loggedIn', true, 7);
+        Cookies.set('userID', response.data.signIn.userID, 7);
+        Cookies.set('userType', response.data.signIn.userType, 7);
+        setUserType(response.data.signIn.userType);
+        setIsLoggedIn(true);
     };
-    const logout = response => {
-        console.log('response2', response);
+    const failLogin = googleResponse => {
+        if (googleResponse.error === 'idpiframe_initialization_failed') {
+            return;
+        }
+        alert(`Error, please try to sign in at a later time! 
+        ${googleResponse.details}`);
     };
+    const logout = () => {
+        Cookies.set('loggedIn', false);
+        Cookies.set('userID', '');
+        Cookies.set('userType', 'Basic');
+        setUserType('Basic');
+        setIsLoggedIn(false);
+    };
+
     return (
         <>
             <div className={classes.toolbar} />
             <Divider />
-            <List>
-                {['Main Page', 'Category Page', 'Product Page'].map((text, index) => (
-                    <Tooltip title={pageToolTips[index]}>
-                        <ListItem button key={text} onClick={e => setChartNumber(index)}>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    </Tooltip>
-                ))}
-            </List>
+            <PageTypeList setChartNumber={setChartNumber} />
             <Divider />
-            <List>
-                {['Errors', 'Metrics', 'Scores'].map((text, index) => (
-                    <Tooltip title={typeToolTips[index]}>
-                        <ListItem
-                            button
-                            key={text}
-                            onClick={async e => {
-                                if (currentSelectedSite === 'Select Site') return;
-                                setDisplayType(text);
-                                setCurrentSiteDisplayed(
-                                    <Typography variant="h5" className={'test'}>
-                                        {`${currentSelectedSite.siteName} (${text})`}:
-                                    </Typography>
-                                );
-                                if (text.toLowerCase() === 'errors') {
-                                    setDisplayData(await loadSiteErrors(currentSelectedSite.siteName));
-                                } else if (text.toLowerCase() === 'metrics') {
-                                    setDisplayData(await loadSiteScores(currentSelectedSite.siteName));
-                                } else {
-                                    setDisplayData(await loadSiteMetrics(currentSelectedSite.siteName));
-                                }
-                            }}
-                        >
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    </Tooltip>
-                ))}
-            </List>
-            <Divider />
-            <List>
-                {['Add Site'].map((text, index) => (
-                    <Tooltip title={addSiteToolTips}>
-                        <Modal key={text}></Modal>
-                    </Tooltip>
-                ))}
-            </List>
-            <GoogleLogin
-                clientId="19242543304-9rrof3emeds7ii5e01epmirn8f483v0l.apps.googleusercontent.com"
-                buttonText="Login"
-                className={classes.google}
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                cookiePolicy={'single_host_origin'}
+            <MapTypeList
+                setDisplayType={setDisplayType}
+                setCurrentSiteDisplayed={setCurrentSiteDisplayed}
+                currentSelectedSite={currentSelectedSite}
+                setDisplayData={setDisplayData}
             />
-            {/* <GoogleLogout clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com" buttonText="Logout" onLogoutSuccess={logout}></GoogleLogout> */}
+            <Divider />
+            <AdminCommands userType={userType} sites={sites} />
+
+            {isLoggedIn || (
+                <GoogleLogin
+                    clientId={process.env.REACT_APP_CLIENT_ID}
+                    buttonText="Login"
+                    className={classes.google}
+                    onSuccess={login}
+                    onFailure={failLogin}
+                    cookiePolicy={'single_host_origin'}
+                />
+            )}
+            {isLoggedIn && <GoogleLogout clientId={process.env.REACT_APP_CLIENT_ID} className={classes.google} buttonText="Logout" onLogoutSuccess={logout} />}
         </>
     );
 };

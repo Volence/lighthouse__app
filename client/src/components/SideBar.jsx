@@ -26,9 +26,35 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SideBar = ({ handleDrawerToggle, mobileDrawerOpen, setChartNumber, currentSelectedSite, setDisplayType, setCurrentSiteDisplayed, setDisplayData }) => {
+const SideBar = ({
+    handleDrawerToggle,
+    mobileDrawerOpen,
+    setChartNumber,
+    currentSelectedSite,
+    setDisplayType,
+    setCurrentSiteDisplayed,
+    setDisplayData,
+    userType,
+    setUserType,
+    isLoggedIn,
+    setIsLoggedIn,
+    sites,
+}) => {
     const classes = useStyles();
-
+    const drawerContents = (
+        <DrawerContents
+            sites={sites}
+            setChartNumber={setChartNumber}
+            currentSelectedSite={currentSelectedSite}
+            setDisplayType={setDisplayType}
+            setCurrentSiteDisplayed={setCurrentSiteDisplayed}
+            setDisplayData={setDisplayData}
+            userType={userType}
+            setUserType={setUserType}
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+        />
+    );
     return (
         <>
             <Hidden smUp implementation="css">
@@ -45,13 +71,7 @@ const SideBar = ({ handleDrawerToggle, mobileDrawerOpen, setChartNumber, current
                         keepMounted: true, // Better open performance on mobile.
                     }}
                 >
-                    <DrawerContents
-                        setChartNumber={setChartNumber}
-                        currentSelectedSite={currentSelectedSite}
-                        setDisplayType={setDisplayType}
-                        setCurrentSiteDisplayed={setCurrentSiteDisplayed}
-                        setDisplayData={setDisplayData}
-                    />
+                    {drawerContents}
                 </Drawer>
             </Hidden>
             <Hidden xsDown implementation="css">
@@ -65,13 +85,7 @@ const SideBar = ({ handleDrawerToggle, mobileDrawerOpen, setChartNumber, current
                     variant="permanent"
                     open
                 >
-                    <DrawerContents
-                        setChartNumber={setChartNumber}
-                        currentSelectedSite={currentSelectedSite}
-                        setDisplayType={setDisplayType}
-                        setCurrentSiteDisplayed={setCurrentSiteDisplayed}
-                        setDisplayData={setDisplayData}
-                    />
+                    {drawerContents}
                 </Drawer>
             </Hidden>
         </>
