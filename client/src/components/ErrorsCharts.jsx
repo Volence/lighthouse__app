@@ -21,6 +21,9 @@ const useStyles = makeStyles(theme => ({
             width: '70%',
         },
     },
+    errorItems: {
+        maxWidth: '100%',
+    },
     chartTitle: {
         marginTop: '0.8rem',
         paddingLeft: '2rem',
@@ -41,6 +44,9 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.up('md')]: {
             width: '30%',
         },
+    },
+    listErrorSection: {
+        width: '100%',
     },
     listErrorsSection: {
         textAlign: 'left',
@@ -151,31 +157,37 @@ const Chart = ({ title, summary, errorData, warningData, failedRequestData, erro
             </Box>
             <Box className={classes.listErrorSection}>
                 {errors !== undefined && errors.length > 0 && (
-                    <ul>
+                    <ul className={classes.errorItems}>
                         <Typography variant="h6">Errors:</Typography>{' '}
                         {errors.map(e => (
-                            <li>
-                                <Typography variant="body2">{e}</Typography>
+                            <li className={classes.errorItems}>
+                                <Typography className={classes.errorItems} variant="body2">
+                                    {e}
+                                </Typography>
                             </li>
                         ))}
                     </ul>
                 )}
                 {warnings !== undefined && warnings.length > 0 && (
-                    <ul>
+                    <ul className={classes.errorItems}>
                         <Typography variant="h6">Warnings:</Typography>{' '}
                         {warnings.map(e => (
-                            <li>
-                                <Typography variant="body2">{e}</Typography>
+                            <li className={classes.errorItems}>
+                                <Typography className={classes.errorItems} variant="body2">
+                                    {e}
+                                </Typography>
                             </li>
                         ))}
                     </ul>
                 )}
                 {failedRequests !== undefined && failedRequests.length > 0 && (
-                    <ul>
+                    <ul className={classes.errorItems}>
                         <Typography variant="h6">Failed Requests:</Typography>{' '}
                         {failedRequests.map(e => (
-                            <li>
-                                <Typography variant="body2">{e}</Typography>
+                            <li className={classes.errorItems}>
+                                <Typography className={classes.errorItems} variant="body2">
+                                    {e}
+                                </Typography>
                             </li>
                         ))}
                     </ul>

@@ -1,12 +1,12 @@
-import React from 'react';
 import AdminCommands from './AdminCommands';
-import { Divider } from '@material-ui/core';
+import Cookies from 'js-cookie';
+import GoogleLogin, { GoogleLogout } from 'react-google-login';
 import MapTypeList from './MapTypeList';
 import PageTypeList from './PageTypeList';
+import React from 'react';
+import { Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import GoogleLogin, { GoogleLogout } from 'react-google-login';
 import { sendSignInMutation } from '../utils';
-import Cookies from 'js-cookie';
 import { signIn } from '../gql/queries';
 
 const useStyles = makeStyles(theme => ({
